@@ -1,0 +1,164 @@
+FASE 1-2 (casi d’uso dettagliati):
+
+- VISITATORE
+    1. UC1 Consultare elenco hackaton
+        - Attore: Visitatore, utente, membro del team e dello staff(organizzatore, mentore, giudice)
+        - Descr: visitatore visualizza la lista degli hackaton pubblicati sulla piattaforma
+        - Precondizioni: niente
+        - Post: elenco hackaton visualizzato
+        - Flusso:
+            - il visitatore accede alla homepage
+            - il sistema mostra l’elenco degli hackaton disponibili
+    2. UC2 visualizzare dettagli hackaton
+        - Attori: Visitatore, utente, membro del team e dello staff(organizzatore, mentore, giudice)
+        - descr: L’utente visualizza i dettagli di un hackathon selezionato.
+        - **Precondizioni:** Hackathon esistente
+        - **Postcondizioni:** Dettagli visualizzati
+        - flusso:
+            - utente seleziona un hackathon
+            - il sistema mostra descr, date, regolamento e stato
+    3. UC3 registrarsi alla piattaforma
+        - Attori: Visitatore
+        - descr: Il visitatore crea un nuovo account sulla piattaforma.
+        - **Precondizioni:** Il visitatore non è registrato
+        - **Postcondizioni:** Account creato
+        - flusso:
+            - inserire dati richiesti
+            - conferma la registrazione
+            - il sistema crea l’account
+- Utente
+    1. UC4 effettuare login
+        - Attori: utente
+        - descr: L’utente accede alla piattaforma tramite credenziali.
+        - precond: account esistente
+        - postcond: utente autenticato
+        - Flusso:
+            - inserimento credenziali
+            - verifica credenziali
+            - accesso consentito
+    2. UC5 creare team
+        - Attori: utente
+        - descr: L’utente crea un nuovo team per partecipare agli hackathon.
+        - **Precondizioni:** L’utente non appartiene a un team
+        - **Postcondizioni:** Team creato
+        - Flusso:
+            - Inserisce nome del team
+            - Conferma creazione
+            - Il sistema registra il team
+    3. UC6 invitare utente a team
+        - Attori: utente(membro del team) ed utente invitato
+        - descr: Un utente invita un altro utente a unirsi al proprio team.
+        - **Precondizioni:** L’utente appartiene a un team
+        - **Postcondizioni:** Invito inviato
+        - Flusso:
+            - Seleziona l’utente da invitare
+            - Invia invito
+            - Il sistema registra l’invito
+    4. UC7 accettare l’invito a team
+        - Attori: utente
+        - descr: L’utente accetta un invito a unirsi a un team.
+        - **Precondizioni:** Invito ricevuto
+        - **Postcondizioni:** Utente aggiunto al team
+        - Flusso:
+            - Visualizza invito
+            - Accetta invito
+            - Il sistema aggiorna il team
+    5. UC8 abbandonare team
+        - Attori: utente
+        - descr: L’utente lascia il team di cui fa parte.
+        - **Precondizioni:** L’utente appartiene a un team
+        - **Postcondizioni:** Utente rimosso dal team
+        - Flusso:
+            - richiede abbandono
+            - conferma operazione
+            - Il sistema aggiorna il team
+- Membro del team
+    1. UC9 iscrivere team a un hackaton
+        - Attori: Membro del Team
+        - descr: Il team si iscrive a un hackathon durante la fase di iscrizione.
+        - **Precondizioni:** Hackathon in iscrizione
+        - **Postcondizioni:** Team iscritto
+        - Flusso:
+            - selezione hackaton
+            - conferma iscrizione
+            - Il sistema registra la partecipazione
+    2. UC10 caricare sottomissione
+        - Attori: Membro del Team
+        - descr:Il team carica la sottomissione del progetto.
+        - **Precondizioni:** Hackathon in corso
+        - **Postcondizioni:** Sottomissione salvata
+        - Flusso:
+            - Inserisce dati sottomissione
+            - conferma invio
+            - Il sistema salva la sottomissione
+    3. UC11 aggiornare sottomissione
+        - Attori: Membro del Team
+        - descr:Il team aggiorna la sottomissione prima della scadenza.
+        - **Precondizioni:** Sottomissione esistente
+        - **Postcondizioni:** Sottomissione aggiornata
+    4. UC12 inviare richiesta di supporto al mentore
+    - Attori: Membro del Team, Mentore
+    - descr: Il team invia una richiesta di supporto ai mentori.
+    - **Precondizioni:** Hackathon in corso
+    - **Postcondizioni:** Richiesta inviata
+- Membro dello staff
+    1. UC13 Consultare elenco hackathon
+        - **Attore primario:** Membro dello Staff
+        - **Descrizione:** Lo staff consulta l’elenco degli hackathon presenti.
+        - **Precondizioni:** Staff autenticato
+        - **Postcondizioni:** Elenco visualizzato
+    2. UC14 Visualizzare sottomissioni hackathon assegnati
+        - **Attore:** Membro dello Staff
+        - Desc: Lo staff visualizza le sottomissioni degli hackathon a cui è assegnato.
+        - Precond: staff assegnato ad un hackaton
+        - post: sottomissioni visualizzate
+- Organizzatore
+    1. UC15 Creare hackathon
+        - Attore: organizzatore
+        - Desc: L’organizzatore crea un nuovo hackathon definendone i parametri.
+        - precond: organizzatore autenticato
+        - postcond:hackaton creato
+    2. UC16 Aggiungere mentore a hackathon
+        - Attori: organizzatore e mentore
+        - desc: L’organizzatore aggiunge uno o più mentori a un hackathon.
+        - precond: hackaton esistente
+        - postcond: mentore assegnato
+    3. UC17 Segnalare violazione regolamento
+        - attori: organizzatore e mentore
+        - desc:L’organizzatore gestisce una segnalazione di violazione del regolamento.
+        - precond: segnalazione presente
+        - postcond: segnalazione gestita
+    4. UC18 Proclamare team vincitore
+    - **Attore primario:** Organizzatore
+    - **Attore secondario:** Sistema di Pagamento
+    - **Descrizione:** L'organizzatore proclama il team vincitore dell'hackathon.
+    - **Precondizioni:** Tutte le valutazioni concluse
+    - **Postcondizioni:** Vincitore proclamato
+- Mentore
+    1. UC19 visualizzare richieste di supporto
+        - Attore mentore
+        - descr: Il mentore visualizza le richieste di supporto dei team.
+    2. UC20 proporre call di supporto
+        - Attore: mentore e calendar
+        - descr:Il mentore propone una call di supporto tramite sistema di calendar.
+    3. UC21 segnalare team per violazione
+        - Attore: mentore e organizzatore
+        - descr:Il mentore segnala un team per violazione del regolamento.
+- Giudice
+    1. UC22 Visualizzare sottomissioni
+        - attore: giudice
+        - desc:Il giudice visualizza le sottomissioni dell’hackathon assegnato.
+    2. UC23 Valutare sottomissione
+        - attore: giudice
+        - descr: Il giudice valuta una sottomissione assegnando un punteggio.
+        - **Postcondizioni:** Valutazione salvata
+- Sistema
+    1. UC24 Pianificare call (Calendar)
+        - Attore: calendar, mentore, membro del team
+        - desc:Il sistema di calendar gestisce la prenotazione delle call.
+    2. UC25 Erogare premio vincitore (Sistema di Pagamento)
+        - attore: sistema di pagamento, organizzatore
+        - desc:Il sistema di pagamento eroga il premio al team vincitore.
+    3. UC26 Aggiornare stato hackathon
+        - Attore: sistema.
+        - descr:Il sistema aggiorna automaticamente lo stato dell’hackathon.
