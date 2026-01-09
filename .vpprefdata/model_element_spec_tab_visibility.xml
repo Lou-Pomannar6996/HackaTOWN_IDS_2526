@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ModelElementSpecTabVisibility version="20191031">
+	<Type id="*">
+		<Tab id="Relations"/>
+	</Type>
 	<Type id="Activity">
 		<Tab id="Owned Behaviors"/>
 		<Tab id="Parameters"/>
