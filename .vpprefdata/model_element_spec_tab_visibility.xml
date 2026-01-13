@@ -2,6 +2,7 @@
 <ModelElementSpecTabVisibility version="20191031">
 	<Type id="*">
 		<Tab id="Relations"/>
+		<Tab id="Stereotypes"/>
 	</Type>
 	<Type id="Activity">
 		<Tab id="Owned Behaviors"/>
