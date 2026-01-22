@@ -12,5 +12,4 @@ public class HomeController {
         model.addAttribute("msg", "Welcome to Hackathown!");
         return "home";
     }
-
 }

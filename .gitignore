@@ -33,8 +33,6 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
 
 # Local-only Spring Boot config (credentials, etc.)
 src/main/resources/application-local.properties
