@@ -1,15 +1,14 @@
 package it.ids.hackathown.web.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class HomeController {
 
     @GetMapping("/")
-    public String home(Model model) {
-        model.addAttribute("msg", "Welcome to Hackathown!");
-        return "home";
+    public Map<String, String> home() {
+        return Map.of("service", "HackHub backend", "status", "UP");
     }
 }
