@@ -194,7 +194,6 @@ public class HackathonService {
         );
 
         WinnerEntity winner = WinnerEntity.builder()
-            .hackathonId(hackathon.getId())
             .hackathon(hackathon)
             .team(winningSubmission.getTeam())
             .paymentTxId(paymentTxId)
