@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "HackathownApplication",
+            "request": "launch",
+            "mainClass": "it.ids.hackathown.HackathownApplication",
+            "projectName": "HackaTOWN_IDS_2526"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-HackathownApplication<hackathown>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

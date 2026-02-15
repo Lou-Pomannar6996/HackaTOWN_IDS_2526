@@ -53,7 +53,12 @@ Variabili utili per MySQL:
 ```
 
 ## Setup dati minimi (H2)
-Non esistono endpoint User. Per provare le API, inserisci prima utenti nel DB (H2 console: `http://localhost:8082/h2-console`).
+Ora esistono endpoint User per registrazione e login. Per provare le API, puoi creare utenti via `POST /api/users`
+e poi fare login con `POST /api/auth/login` per ottenere l'id utente.
+
+Se vuoi inserire manualmente utenti nel DB (H2 console: `http://localhost:8082/h2-console`), puoi continuare
+a usare SQL. Nota: `password_hash` e opzionale; senza di essa la login fallira, ma puoi comunque usare l'`X-USER-ID`
+per le API che lo richiedono.
 Credenziali H2 di default:
 - JDBC URL: `jdbc:h2:mem:hackhub`
 - User: `sa`
@@ -70,6 +75,40 @@ insert into user_roles (user_id, roles) values (1, 'ORGANIZER');
 insert into user_roles (user_id, roles) values (2, 'JUDGE');
 insert into user_roles (user_id, roles) values (3, 'MENTOR');
 insert into user_roles (user_id, roles) values (4, 'REGISTERED_USER');
+```
+
+## Login e registrazione (curl)
+Registrazione utente:
+```bash
+curl -X POST http://localhost:8082/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@hackhub.dev",
+    "password": "Password123",
+    "nome": "Mario",
+    "cognome": "Rossi"
+  }'
+```
+
+Login:
+```bash
+curl -X POST http://localhost:8082/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@hackhub.dev",
+    "password": "Password123"
+  }'
+```
+
+## Admin: assegna ruoli (curl)
+Nota: richiede che l'utente chiamante abbia ruolo `ADMIN`.
+```bash
+curl -X PUT http://localhost:8082/api/admin/users/1/roles \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 99" \
+  -d '{
+    "roles": ["ORGANIZER", "JUDGE"]
+  }'
 ```
 
 ## 5 endpoint chiave (curl)

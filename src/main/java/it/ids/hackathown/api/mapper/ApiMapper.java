@@ -8,6 +8,7 @@ import it.ids.hackathown.api.dto.response.RegistrationResponse;
 import it.ids.hackathown.api.dto.response.SubmissionResponse;
 import it.ids.hackathown.api.dto.response.SupportRequestResponse;
 import it.ids.hackathown.api.dto.response.TeamResponse;
+import it.ids.hackathown.api.dto.response.UserResponse;
 import it.ids.hackathown.api.dto.response.ViolationResponse;
 import it.ids.hackathown.api.dto.response.WinnerResponse;
 import it.ids.hackathown.domain.entity.CallProposalEntity;
@@ -18,6 +19,7 @@ import it.ids.hackathown.domain.entity.SubmissionEntity;
 import it.ids.hackathown.domain.entity.SupportRequestEntity;
 import it.ids.hackathown.domain.entity.TeamEntity;
 import it.ids.hackathown.domain.entity.TeamInviteEntity;
+import it.ids.hackathown.domain.entity.UserEntity;
 import it.ids.hackathown.domain.entity.ViolationReportEntity;
 import it.ids.hackathown.domain.entity.WinnerEntity;
 import org.springframework.stereotype.Component;
@@ -46,6 +48,15 @@ public class ApiMapper {
 
     public TeamResponse toResponse(TeamEntity team) {
         return new TeamResponse(team.getId(), team.getName(), team.getMaxSize());
+    }
+
+    public UserResponse toResponse(UserEntity user) {
+        return new UserResponse(
+            user.getId(),
+            user.getEmail(),
+            user.getName(),
+            user.getRoles()
+        );
     }
 
     public InviteResponse toResponse(TeamInviteEntity invite) {
