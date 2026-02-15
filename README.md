@@ -2,6 +2,10 @@
 
 Backend Spring Boot (Java 21) per il progetto d'esame HackHub.
 
+## Prerequisiti
+- JDK 21 installato
+- Gradle Wrapper incluso nel progetto (non serve installare Gradle)
+
 ## Stack
 - Spring Boot 3.4
 - Spring Web + Spring Data JPA + Bean Validation
@@ -9,12 +13,29 @@ Backend Spring Boot (Java 21) per il progetto d'esame HackHub.
 - Lombok
 
 ## Avvio rapido
-1. Avvia l'app:
+1. Avvia l'app (porta default `8082`):
 ```powershell
 .\gradlew.bat bootRun
 ```
-2. API disponibili su `http://localhost:8082`
+2. Verifica che sia attiva:
+```bash
+curl http://localhost:8082/
+```
 3. Header obbligatorio per le API protette logicamente: `X-USER-ID`
+
+Se la porta `8082` e occupata:
+```powershell
+.\gradlew.bat bootRun --args="--server.port=8084"
+```
+oppure:
+```powershell
+java -jar build/libs/hackathown-0.0.1-SNAPSHOT.jar --server.port=8084
+```
+
+Controllo porte occupate (Windows):
+```powershell
+Get-NetTCPConnection -LocalPort 8082 -State Listen
+```
 
 ## Profili database
 - Default (H2 in-memory): nessun parametro extra
@@ -33,6 +54,10 @@ Variabili utili per MySQL:
 
 ## Setup dati minimi (H2)
 Non esistono endpoint User. Per provare le API, inserisci prima utenti nel DB (H2 console: `http://localhost:8082/h2-console`).
+Credenziali H2 di default:
+- JDBC URL: `jdbc:h2:mem:hackhub`
+- User: `sa`
+- Password: vuota
 
 Esempio SQL minimo:
 ```sql
@@ -48,6 +73,8 @@ insert into user_roles (user_id, roles) values (4, 'REGISTERED_USER');
 ```
 
 ## 5 endpoint chiave (curl)
+Negli esempi seguenti usa la porta effettiva scelta in avvio (`8082` o alternativa).
+
 1. Crea hackathon
 ```bash
 curl -X POST http://localhost:8082/api/hackathons \
@@ -119,6 +146,13 @@ curl -X POST http://localhost:8082/api/submissions/1/evaluations \
 
 curl -X POST http://localhost:8082/api/hackathons/1/declare-winner -H "X-USER-ID: 1"
 ```
+
+6. Elimina hackathon (esempio: id `2`)
+```bash
+curl -X DELETE http://localhost:8082/api/hackathons/2 \
+  -H "X-USER-ID: 1"
+```
+Nota: la cancellazione e consentita solo all'organizer assegnato a quell'hackathon.
 
 ## Dove sono applicati i pattern
 ### Strategy

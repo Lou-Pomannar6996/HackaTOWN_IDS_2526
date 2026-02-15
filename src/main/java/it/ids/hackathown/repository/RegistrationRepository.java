@@ -11,4 +11,6 @@ public interface RegistrationRepository extends JpaRepository<RegistrationEntity
     List<RegistrationEntity> findByHackathon_Id(Long hackathonId);
 
     long countByHackathon_Id(Long hackathonId);
+
+    void deleteByHackathon_Id(Long hackathonId);
 }

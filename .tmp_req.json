@@ -1,0 +1,14 @@
+{
+  "name": "HackHub 2026",
+  "rules": "General rules",
+  "registrationDeadline": "2026-03-01T18:00:00",
+  "startDate": "2026-03-02T09:00:00",
+  "endDate": "2026-03-03T18:00:00",
+  "location": "Ancona",
+  "prizeMoney": 1500,
+  "maxTeamSize": 5,
+  "judgeUserId": 2,
+  "mentorUserIds": [3],
+  "scoringPolicyType": "INNOVATION_WEIGHTED",
+  "validationPolicyType": "REPO_REQUIRED"
+}

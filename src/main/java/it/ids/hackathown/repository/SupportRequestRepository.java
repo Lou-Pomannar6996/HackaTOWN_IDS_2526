@@ -10,4 +10,6 @@ public interface SupportRequestRepository extends JpaRepository<SupportRequestEn
     List<SupportRequestEntity> findByHackathon_Id(Long hackathonId);
 
     List<SupportRequestEntity> findByHackathon_IdAndStatus(Long hackathonId, SupportRequestStatus status);
+
+    void deleteByHackathon_Id(Long hackathonId);
 }

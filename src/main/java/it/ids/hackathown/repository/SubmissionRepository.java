@@ -12,4 +12,6 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, Lo
     Optional<SubmissionEntity> findByHackathon_IdAndTeam_Id(Long hackathonId, Long teamId);
 
     List<SubmissionEntity> findByHackathon_Id(Long hackathonId);
+
+    void deleteByHackathon_Id(Long hackathonId);
 }

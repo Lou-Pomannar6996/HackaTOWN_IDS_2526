@@ -84,7 +84,11 @@ public class AccessControlService {
 
     public void assertJudge(HackathonEntity hackathon, Long userId) {
         if (!hackathon.getJudge().getId().equals(userId)) {
-            throw new DomainException(HttpStatus.FORBIDDEN, "Only the assigned judge can perform this action");
+            throw new DomainException(
+                HttpStatus.FORBIDDEN,
+                "Only the assigned judge can perform this action. Assigned judge id is "
+                    + hackathon.getJudge().getId()
+            );
         }
     }
 

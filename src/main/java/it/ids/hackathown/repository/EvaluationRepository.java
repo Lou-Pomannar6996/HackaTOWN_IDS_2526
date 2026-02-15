@@ -14,4 +14,6 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, Lo
     boolean existsBySubmission_Id(Long submissionId);
 
     long countByHackathon_Id(Long hackathonId);
+
+    void deleteByHackathon_Id(Long hackathonId);
 }

@@ -9,4 +9,6 @@ public interface WinnerRepository extends JpaRepository<WinnerEntity, Long> {
     Optional<WinnerEntity> findByHackathon_Id(Long hackathonId);
 
     boolean existsByHackathon_Id(Long hackathonId);
+
+    void deleteByHackathon_Id(Long hackathonId);
 }

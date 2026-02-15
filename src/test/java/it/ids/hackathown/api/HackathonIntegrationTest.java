@@ -3,30 +3,40 @@ package it.ids.hackathown.api;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.ids.hackathown.domain.entity.CallProposalEntity;
 import it.ids.hackathown.domain.entity.EvaluationEntity;
 import it.ids.hackathown.domain.entity.HackathonEntity;
 import it.ids.hackathown.domain.entity.RegistrationEntity;
 import it.ids.hackathown.domain.entity.SubmissionEntity;
+import it.ids.hackathown.domain.entity.SupportRequestEntity;
 import it.ids.hackathown.domain.entity.TeamEntity;
 import it.ids.hackathown.domain.entity.UserEntity;
+import it.ids.hackathown.domain.entity.ViolationReportEntity;
 import it.ids.hackathown.domain.entity.WinnerEntity;
+import it.ids.hackathown.domain.enums.CallProposalStatus;
 import it.ids.hackathown.domain.enums.HackathonStateType;
 import it.ids.hackathown.domain.enums.ScoringPolicyType;
 import it.ids.hackathown.domain.enums.SubmissionStatus;
+import it.ids.hackathown.domain.enums.SupportRequestStatus;
 import it.ids.hackathown.domain.enums.UserRole;
 import it.ids.hackathown.domain.enums.ValidationPolicyType;
+import it.ids.hackathown.repository.CallProposalRepository;
 import it.ids.hackathown.repository.EvaluationRepository;
 import it.ids.hackathown.repository.HackathonRepository;
 import it.ids.hackathown.repository.RegistrationRepository;
 import it.ids.hackathown.repository.SubmissionRepository;
+import it.ids.hackathown.repository.SupportRequestRepository;
 import it.ids.hackathown.repository.TeamRepository;
 import it.ids.hackathown.repository.UserRepository;
+import it.ids.hackathown.repository.ViolationReportRepository;
 import it.ids.hackathown.repository.WinnerRepository;
+import it.ids.hackathown.service.HackathonService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -72,6 +82,18 @@ class HackathonIntegrationTest {
 
     @Autowired
     private WinnerRepository winnerRepository;
+
+    @Autowired
+    private SupportRequestRepository supportRequestRepository;
+
+    @Autowired
+    private CallProposalRepository callProposalRepository;
+
+    @Autowired
+    private ViolationReportRepository violationReportRepository;
+
+    @Autowired
+    private HackathonService hackathonService;
 
     @BeforeEach
     void beforeEach() {
@@ -184,6 +206,82 @@ class HackathonIntegrationTest {
             .andExpect(jsonPath("$.title").value("ForbiddenActionForState"));
     }
 
+    @Test
+    void deleteHackathon_endpointDeletesHackathonAndRelatedData() throws Exception {
+        UserEntity organizer = saveUser("org-delete@hackhub.dev", "Organizer Delete", Set.of(UserRole.ORGANIZER));
+        UserEntity judge = saveUser("judge-delete@hackhub.dev", "Judge Delete", Set.of(UserRole.JUDGE));
+        UserEntity mentor = saveUser("mentor-delete@hackhub.dev", "Mentor Delete", Set.of(UserRole.MENTOR));
+        UserEntity member = saveUser("member-delete@hackhub.dev", "Member Delete", Set.of(UserRole.REGISTERED_USER));
+
+        TeamEntity team = saveTeam("DeleteTeam", 4, Set.of(member));
+        HackathonEntity hackathon = saveHackathon(
+            "Hackathon To Delete",
+            organizer,
+            judge,
+            HackathonStateType.IN_VALUTAZIONE,
+            ScoringPolicyType.DEFAULT,
+            ValidationPolicyType.BASIC
+        );
+        hackathon.getMentors().add(mentor);
+        hackathon = hackathonRepository.save(hackathon);
+
+        registrationRepository.save(RegistrationEntity.builder().hackathon(hackathon).team(team).build());
+
+        SubmissionEntity submission = submissionRepository.save(SubmissionEntity.builder()
+            .hackathon(hackathon)
+            .team(team)
+            .repoUrl("https://github.com/org/delete-team")
+            .description("Submission to be deleted")
+            .updatedAt(LocalDateTime.now())
+            .status(SubmissionStatus.SUBMITTED)
+            .build());
+
+        evaluationRepository.save(EvaluationEntity.builder()
+            .hackathon(hackathon)
+            .submission(submission)
+            .judge(judge)
+            .score0to10(new BigDecimal("7.50"))
+            .comment("To be removed")
+            .build());
+
+        supportRequestRepository.save(SupportRequestEntity.builder()
+            .hackathon(hackathon)
+            .team(team)
+            .message("Need help")
+            .status(SupportRequestStatus.OPEN)
+            .build());
+
+        callProposalRepository.save(CallProposalEntity.builder()
+            .hackathon(hackathon)
+            .team(team)
+            .mentor(mentor)
+            .proposedSlots("2026-03-10T10:00,2026-03-10T11:00")
+            .status(CallProposalStatus.PROPOSED)
+            .build());
+
+        violationReportRepository.save(ViolationReportEntity.builder()
+            .hackathon(hackathon)
+            .team(team)
+            .mentor(mentor)
+            .reason("Violation for deletion test")
+            .build());
+
+        WinnerEntity winner = hackathonService.declareWinner(hackathon.getId(), organizer.getId());
+
+        mockMvc.perform(delete("/api/hackathons/{hackathonId}", hackathon.getId())
+                .header("X-USER-ID", organizer.getId()))
+            .andExpect(status().isNoContent());
+
+        assertTrue(hackathonRepository.findById(hackathon.getId()).isEmpty());
+        assertTrue(registrationRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(submissionRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(evaluationRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(supportRequestRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(callProposalRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(violationReportRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(!winnerRepository.existsByHackathon_Id(winner.getHackathonId()));
+    }
+
     private UserEntity saveUser(String email, String name, Set<UserRole> roles) {
         UserEntity user = UserEntity.builder()
             .email(email)
@@ -233,6 +331,9 @@ class HackathonIntegrationTest {
     private void cleanupAll() {
         winnerRepository.deleteAll();
         evaluationRepository.deleteAll();
+        callProposalRepository.deleteAll();
+        supportRequestRepository.deleteAll();
+        violationReportRepository.deleteAll();
         submissionRepository.deleteAll();
         registrationRepository.deleteAll();
         hackathonRepository.deleteAll();

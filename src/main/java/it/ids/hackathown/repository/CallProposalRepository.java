@@ -9,4 +9,6 @@ public interface CallProposalRepository extends JpaRepository<CallProposalEntity
     List<CallProposalEntity> findByHackathon_Id(Long hackathonId);
 
     List<CallProposalEntity> findByMentor_Id(Long mentorId);
+
+    void deleteByHackathon_Id(Long hackathonId);
 }
