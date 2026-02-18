@@ -26,11 +26,11 @@ public class TeamController {
     private final ApiMapper mapper;
 
     @PostMapping
-    public ResponseEntity<TeamResponse> createTeam(
+    public ResponseEntity<TeamResponse> creaTeam(
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody CreateTeamRequest request
     ) {
-        TeamResponse response = mapper.toResponse(teamService.createTeam(currentUserId, request.name(), request.maxSize()));
+        TeamResponse response = mapper.toResponse(teamService.creaTeam(currentUserId, request.name(), request.maxSize()));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -45,10 +45,10 @@ public class TeamController {
     }
 
     @PostMapping("/{teamId}/leave")
-    public TeamResponse leaveTeam(
+    public TeamResponse abbandonaTeam(
         @PathVariable Long teamId,
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
     ) {
-        return mapper.toResponse(teamService.leaveTeam(teamId, currentUserId));
+        return mapper.toResponse(teamService.abbandonaTeam(teamId, currentUserId));
     }
 }

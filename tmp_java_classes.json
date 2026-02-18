@@ -1,0 +1,482 @@
+[
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\HackathownApplication.java",
+    "kind": "class",
+    "name": "HackathownApplication"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\AdminController.java",
+    "kind": "class",
+    "name": "AdminController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\AutenticazioneController.java",
+    "kind": "class",
+    "name": "AutenticazioneController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\CallController.java",
+    "kind": "class",
+    "name": "CallController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\EvaluationController.java",
+    "kind": "class",
+    "name": "EvaluationController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\HackathonController.java",
+    "kind": "class",
+    "name": "HackathonController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\HeaderConstants.java",
+    "kind": "class",
+    "name": "HeaderConstants"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\InvitoController.java",
+    "kind": "class",
+    "name": "InvitoController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\PagamentoController.java",
+    "kind": "class",
+    "name": "PagamentoController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\RegistrationController.java",
+    "kind": "class",
+    "name": "RegistrationController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\SubmissionController.java",
+    "kind": "class",
+    "name": "SubmissionController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\SupportoController.java",
+    "kind": "class",
+    "name": "SupportoController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\TeamController.java",
+    "kind": "class",
+    "name": "TeamController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\UtenteController.java",
+    "kind": "class",
+    "name": "UtenteController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\controller\\ViolationController.java",
+    "kind": "class",
+    "name": "ViolationController"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\error\\GlobalExceptionHandler.java",
+    "kind": "class",
+    "name": "GlobalExceptionHandler"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\api\\mapper\\ApiMapper.java",
+    "kind": "class",
+    "name": "ApiMapper"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\AssegnazioneStaff.java",
+    "kind": "class",
+    "name": "AssegnazioneStaff"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\CallSupporto.java",
+    "kind": "class",
+    "name": "CallSupporto"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\EsitoHackathon.java",
+    "kind": "class",
+    "name": "EsitoHackathon"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\Hackathon.java",
+    "kind": "class",
+    "name": "Hackathon"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\Invito.java",
+    "kind": "class",
+    "name": "Invito"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\Iscrizione.java",
+    "kind": "class",
+    "name": "Iscrizione"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\PagamentoPremio.java",
+    "kind": "class",
+    "name": "PagamentoPremio"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\RichiestaSupporto.java",
+    "kind": "class",
+    "name": "RichiestaSupporto"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\SegnalazioneViolazione.java",
+    "kind": "class",
+    "name": "SegnalazioneViolazione"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\Sottomissione.java",
+    "kind": "class",
+    "name": "Sottomissione"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\Team.java",
+    "kind": "class",
+    "name": "Team"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\Utente.java",
+    "kind": "class",
+    "name": "Utente"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\entity\\Valutazione.java",
+    "kind": "class",
+    "name": "Valutazione"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\CallProposalStatus.java",
+    "kind": "enum",
+    "name": "CallProposalStatus"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\HackathonStateType.java",
+    "kind": "enum",
+    "name": "HackathonStateType"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\InviteStatus.java",
+    "kind": "enum",
+    "name": "InviteStatus"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\ScoringPolicyType.java",
+    "kind": "enum",
+    "name": "ScoringPolicyType"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\SubmissionStatus.java",
+    "kind": "enum",
+    "name": "SubmissionStatus"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\SupportRequestStatus.java",
+    "kind": "enum",
+    "name": "SupportRequestStatus"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\UserRole.java",
+    "kind": "enum",
+    "name": "UserRole"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\enums\\ValidationPolicyType.java",
+    "kind": "enum",
+    "name": "ValidationPolicyType"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\exception\\ConflictException.java",
+    "kind": "class",
+    "name": "ConflictException"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\exception\\DomainException.java",
+    "kind": "class",
+    "name": "DomainException"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\exception\\DomainValidationException.java",
+    "kind": "class",
+    "name": "DomainValidationException"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\exception\\ForbiddenActionForState.java",
+    "kind": "class",
+    "name": "ForbiddenActionForState"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\exception\\NotFoundException.java",
+    "kind": "class",
+    "name": "NotFoundException"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\exception\\UnauthorizedException.java",
+    "kind": "class",
+    "name": "UnauthorizedException"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\state\\CompletedState.java",
+    "kind": "class",
+    "name": "CompletedState"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\state\\EvaluationState.java",
+    "kind": "class",
+    "name": "EvaluationState"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\state\\HackathonContext.java",
+    "kind": "class",
+    "name": "HackathonContext"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\state\\HackathonState.java",
+    "kind": "interface",
+    "name": "HackathonState"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\state\\HackathonStateFactory.java",
+    "kind": "class",
+    "name": "HackathonStateFactory"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\state\\RegistrationState.java",
+    "kind": "class",
+    "name": "RegistrationState"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\state\\RunningState.java",
+    "kind": "class",
+    "name": "RunningState"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\ScoringStrategyRegistry.java",
+    "kind": "class",
+    "name": "ScoringStrategyRegistry"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\SubmissionValidationStrategyRegistry.java",
+    "kind": "class",
+    "name": "SubmissionValidationStrategyRegistry"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\scoring\\AbstractScoringStrategy.java",
+    "kind": "class",
+    "name": "AbstractScoringStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\scoring\\DefaultScoringStrategy.java",
+    "kind": "class",
+    "name": "DefaultScoringStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\scoring\\InnovationWeightedScoringStrategy.java",
+    "kind": "class",
+    "name": "InnovationWeightedScoringStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\scoring\\ScoringStrategy.java",
+    "kind": "interface",
+    "name": "ScoringStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\scoring\\TechnicalWeightedScoringStrategy.java",
+    "kind": "class",
+    "name": "TechnicalWeightedScoringStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\validation\\BasicSubmissionValidationStrategy.java",
+    "kind": "class",
+    "name": "BasicSubmissionValidationStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\validation\\RepoRequiredValidationStrategy.java",
+    "kind": "class",
+    "name": "RepoRequiredValidationStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\validation\\SubmissionValidationStrategy.java",
+    "kind": "interface",
+    "name": "SubmissionValidationStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\domain\\strategy\\validation\\ZipAndDescriptionValidationStrategy.java",
+    "kind": "class",
+    "name": "ZipAndDescriptionValidationStrategy"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\integration\\calendar\\CalendarGateway.java",
+    "kind": "interface",
+    "name": "CalendarGateway"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\integration\\calendar\\InMemoryCalendarGateway.java",
+    "kind": "class",
+    "name": "InMemoryCalendarGateway"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\integration\\payment\\InMemoryPaymentGateway.java",
+    "kind": "class",
+    "name": "InMemoryPaymentGateway"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\integration\\payment\\PaymentGateway.java",
+    "kind": "interface",
+    "name": "PaymentGateway"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\AssegnazioneStaffRepository.java",
+    "kind": "interface",
+    "name": "AssegnazioneStaffRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\CallSupportoRepository.java",
+    "kind": "interface",
+    "name": "CallSupportoRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\EsitoHackathonRepository.java",
+    "kind": "interface",
+    "name": "EsitoHackathonRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\HackathonRepository.java",
+    "kind": "interface",
+    "name": "HackathonRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\InvitoRepository.java",
+    "kind": "interface",
+    "name": "InvitoRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\IscrizioneRepository.java",
+    "kind": "interface",
+    "name": "IscrizioneRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\PagamentoPremioRepository.java",
+    "kind": "interface",
+    "name": "PagamentoPremioRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\RichiestaSupportoRepository.java",
+    "kind": "interface",
+    "name": "RichiestaSupportoRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\SegnalazioneValidazioneRepository.java",
+    "kind": "interface",
+    "name": "SegnalazioneValidazioneRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\SottomissioneRepository.java",
+    "kind": "interface",
+    "name": "SottomissioneRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\TeamRepository.java",
+    "kind": "interface",
+    "name": "TeamRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\UtenteRepository.java",
+    "kind": "interface",
+    "name": "UtenteRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\repository\\ValutazioneRepository.java",
+    "kind": "interface",
+    "name": "ValutazioneRepository"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\AccessControlService.java",
+    "kind": "class",
+    "name": "AccessControlService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\AutenticazioneService.java",
+    "kind": "class",
+    "name": "AutenticazioneService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\CalendarService.java",
+    "kind": "class",
+    "name": "CalendarService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\EvaluationService.java",
+    "kind": "class",
+    "name": "EvaluationService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\HackathonService.java",
+    "kind": "class",
+    "name": "HackathonService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\InvitoService.java",
+    "kind": "class",
+    "name": "InvitoService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\NotificationService.java",
+    "kind": "class",
+    "name": "NotificationService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\PasswordHasher.java",
+    "kind": "class",
+    "name": "PasswordHasher"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\PaymentService.java",
+    "kind": "class",
+    "name": "PaymentService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\RegistrationService.java",
+    "kind": "class",
+    "name": "RegistrationService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\SubmissionService.java",
+    "kind": "class",
+    "name": "SubmissionService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\SupportoService.java",
+    "kind": "class",
+    "name": "SupportoService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\TeamService.java",
+    "kind": "class",
+    "name": "TeamService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\UserValidationService.java",
+    "kind": "class",
+    "name": "UserValidationService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\UtenteService.java",
+    "kind": "class",
+    "name": "UtenteService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\service\\ViolationService.java",
+    "kind": "class",
+    "name": "ViolationService"
+  },
+  {
+    "path": "src/main/java\\it\\ids\\hackathown\\web\\controller\\HomeController.java",
+    "kind": "class",
+    "name": "HomeController"
+  }
+]

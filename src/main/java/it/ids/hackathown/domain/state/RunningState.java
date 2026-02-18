@@ -1,6 +1,6 @@
 package it.ids.hackathown.domain.state;
 
-import it.ids.hackathown.domain.entity.HackathonEntity;
+import it.ids.hackathown.domain.entity.Hackathon;
 import it.ids.hackathown.domain.enums.HackathonStateType;
 import org.springframework.stereotype.Component;
 
@@ -13,27 +13,27 @@ public class RunningState implements HackathonState {
     }
 
     @Override
-    public void submit(HackathonEntity hackathon) {
+    public void submit(Hackathon hackathon) {
         // allowed
     }
 
     @Override
-    public void updateSubmission(HackathonEntity hackathon) {
+    public void updateSubmission(Hackathon hackathon) {
         // allowed
     }
 
     @Override
-    public void requestSupport(HackathonEntity hackathon) {
+    public void requestSupport(Hackathon hackathon) {
         // allowed
     }
 
     @Override
-    public void proposeCall(HackathonEntity hackathon) {
+    public void proposeCall(Hackathon hackathon) {
         // allowed
     }
 
     @Override
-    public void startEvaluation(HackathonEntity hackathon) {
-        hackathon.setStateEnum(HackathonStateType.IN_VALUTAZIONE);
+    public void startEvaluation(Hackathon hackathon) {
+        hackathon.setStato(HackathonStateType.IN_VALUTAZIONE);
     }
 }

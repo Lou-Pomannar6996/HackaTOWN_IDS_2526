@@ -1,0 +1,812 @@
+{
+  "Utente": {
+    "attributes": [
+      "id",
+      "email",
+      "password",
+      "nome",
+      "cognome",
+      "dataRegistrazione",
+      "teamCorrente"
+    ],
+    "operations": [
+      "isInTeam",
+      "entraInTeam",
+      "abbandonaTeam"
+    ]
+  },
+  "UtenteRepository": {
+    "attributes": [],
+    "operations": [
+      "findById",
+      "findByEmail",
+      "save",
+      "update",
+      "existsByEmail"
+    ]
+  },
+  "Team": {
+    "attributes": [
+      "id",
+      "nome",
+      "dataCreazione",
+      "maxMembri",
+      "membri"
+    ],
+    "operations": [
+      "addMembro",
+      "removeMembro"
+    ]
+  },
+  "Hackathon": {
+    "attributes": [
+      "id",
+      "nome",
+      "descrizione",
+      "regolamento",
+      "dataInizio",
+      "dataFine",
+      "scadenzaIscrizioni",
+      "luogo",
+      "premio",
+      "maxTeamSize",
+      "stato"
+    ],
+    "operations": [
+      "isInIscrizione",
+      "inInCorso",
+      "isInValutazione",
+      "isConcluso",
+      "iscrizioniAperte",
+      "sottomissioniAperte"
+    ]
+  },
+  "Invito": {
+    "attributes": [
+      "id",
+      "dataInvio",
+      "stato",
+      "messaggio",
+      "mittente",
+      "destinatario",
+      "team"
+    ],
+    "operations": [
+      "accetta",
+      "rifiuta",
+      "isPending",
+      "isAccepted",
+      "isRejected"
+    ]
+  },
+  "RichiestaSupporto": {
+    "attributes": [
+      "id",
+      "descrizione",
+      "dataRichiesta",
+      "stato",
+      "team",
+      "hackathon",
+      "call"
+    ],
+    "operations": [
+      "isPending",
+      "isGestita",
+      "chiudi",
+      "pianificaCall",
+      "isChiusa"
+    ]
+  },
+  "Iscrizione": {
+    "attributes": [
+      "id",
+      "team",
+      "hackathon",
+      "dataIscrizione",
+      "stato"
+    ],
+    "operations": [
+      "isAttiva",
+      "isAnnullata"
+    ]
+  },
+  "StatoHackathon": {
+    "attributes": [
+      "IN_ISCRIZIONE",
+      "IN_CORSO",
+      "IN_VALUTAZIONE",
+      "CONCLUSO"
+    ],
+    "operations": []
+  },
+  "StatoInvito": {
+    "attributes": [
+      "PENDING",
+      "ACCEPTED",
+      "REJECTED"
+    ],
+    "operations": []
+  },
+  " StatoRichiesta": {
+    "attributes": [
+      "APERTA",
+      "IN_GESTIONE",
+      "CHIUSA"
+    ],
+    "operations": []
+  },
+  "TeamRepository": {
+    "attributes": [],
+    "operations": [
+      "findById",
+      "findByNome",
+      "findAll",
+      "save",
+      "update"
+    ]
+  },
+  "HackathonRepository": {
+    "attributes": [],
+    "operations": [
+      "findById",
+      "findAllPublic",
+      "save",
+      "update"
+    ]
+  },
+  "InvitoRepository": {
+    "attributes": [],
+    "operations": [
+      "findById",
+      "findByDestinatarioId",
+      "findByMittenteId",
+      "save",
+      "update"
+    ]
+  },
+  "IscrizioneRepository": {
+    "attributes": [],
+    "operations": [
+      "findById",
+      "save",
+      "existsByTeamIdAndHackathonId",
+      "findByTeamAndHackathon"
+    ]
+  },
+  "AutenticazioneService": {
+    "attributes": [
+      "utenteRepository"
+    ],
+    "operations": [
+      "login",
+      "logout",
+      "validaCredenziali",
+      "hashPassword",
+      "verificaPassword"
+    ]
+  },
+  "UtenteService": {
+    "attributes": [
+      "utenteRepository"
+    ],
+    "operations": [
+      "registraUtente",
+      "trovaUtentePerId",
+      "trovaUtentePerEmail",
+      "aggiornaUtente",
+      "eliminaUtente",
+      "emailDisponibile"
+    ]
+  },
+  "TeamService": {
+    "attributes": [
+      "teamRepository",
+      "utenteRepository"
+    ],
+    "operations": [
+      "creaTeam",
+      "utenteDisponibilePerTeam",
+      "abbandonaTeam"
+    ]
+  },
+  "HackathonService": {
+    "attributes": [
+      "hackathonRepository",
+      "iscrizioneRepository",
+      "utenteRepository",
+      "assegnazioneStaffRepository",
+      "paymentService",
+      "sottomissioneRepository",
+      "valutazioneRepository",
+      "esitoRepository"
+    ],
+    "operations": [
+      "listaHackathonPubblici",
+      "creaHackathon",
+      "validaDatiHackathon",
+      "aggiungiMentore",
+      "iscriviTeam",
+      "verificaStatoHackathon",
+      "verificaRequisitiTeam",
+      "erogaPremio",
+      "getDettaglioHackathon",
+      "getFormAggiornaStato",
+      "aggiornaStato",
+      "calcolaTransizioniPossibili",
+      "isTransizioneConsentita",
+      "preparaProclama",
+      "proclamaVincitore",
+      "listaTeamCandidati",
+      "creaEsitoHackathon"
+    ]
+  },
+  "InvitoService": {
+    "attributes": [
+      "invitoRepository",
+      "utenteRepository",
+      "teamRepository"
+    ],
+    "operations": [
+      "invitaUtenteATeam",
+      "accettaInvito",
+      "rifiutaInvito",
+      "invitiPendentiPerUtente",
+      "getInviti",
+      "accettaInvito"
+    ]
+  },
+  "SupportoService": {
+    "attributes": [
+      "richiestaSupportoRepository",
+      "calendarService",
+      "iscrizioneRepository",
+      "callSupportoRepository",
+      "assegnazioneStaffRepository",
+      "hackathonRepository"
+    ],
+    "operations": [
+      "listaRichieste",
+      "pianificaCall",
+      "creaRichiestaSupporto",
+      "getRichiesteSupporto",
+      "proponiCall",
+      "getDettaglioRichiesta"
+    ]
+  },
+  "AutenticazioneController": {
+    "attributes": [
+      "autenticazioneService"
+    ],
+    "operations": [
+      "login"
+    ]
+  },
+  "UtenteController": {
+    "attributes": [
+      "utenteService"
+    ],
+    "operations": [
+      "registraUtente"
+    ]
+  },
+  "TeamController": {
+    "attributes": [
+      "teamService"
+    ],
+    "operations": [
+      "creaTeam",
+      "abbandonaTeam"
+    ]
+  },
+  "HackathonController": {
+    "attributes": [
+      "hackathonService"
+    ],
+    "operations": [
+      "getElencoHackathon",
+      "creaHackathon",
+      "iscriviTeam",
+      "aggiungiMentore",
+      "erogaPremio",
+      "getDettaglioHackathon",
+      "getFormAggiornaStato",
+      "aggiornaStato",
+      "preparaProclama",
+      "proclamaVincitore"
+    ]
+  },
+  "InvitoController": {
+    "attributes": [
+      "invitoService"
+    ],
+    "operations": [
+      "invitaUtente",
+      "accettaInvito",
+      "getInvitiUtente"
+    ]
+  },
+  "AssegnazioneStaff": {
+    "attributes": [
+      "ruolo",
+      "dataAssegnazione",
+      "hackathon",
+      "staff"
+    ],
+    "operations": [
+      "isMentore",
+      "isGiudice"
+    ]
+  },
+  "AssegnazioneStaffRepository": {
+    "attributes": [],
+    "operations": [
+      "save",
+      "exists",
+      "findByHackathonAndRuolo",
+      "findHAckathonIdsByStaffIdAndRuolo",
+      "existsByStaffIdAndHackathonIdAndRuolo",
+      "existsByStaffAndHackathon"
+    ]
+  },
+  "RichiestaSupportoRepository": {
+    "attributes": [],
+    "operations": [
+      "findByHackathon",
+      "findById",
+      "save",
+      "update",
+      "findByHackathonIds"
+    ]
+  },
+  "CalendarService": {
+    "attributes": [],
+    "operations": [
+      "createEvent"
+    ]
+  },
+  "PaymentService": {
+    "attributes": [
+      "assegnazioneStaffRepository",
+      "hackathonRepository",
+      "esitoRepository",
+      "pagamentoRepository",
+      "sistemaPagamento"
+    ],
+    "operations": [
+      "executePayment",
+      "erogaPremio",
+      "checkStatoErogazione",
+      "eseguiPagamento",
+      "creaPagamento"
+    ]
+  },
+  "SupportoController": {
+    "attributes": [
+      "supportoService"
+    ],
+    "operations": [
+      "getRichieste",
+      "pianificaCall",
+      "inviaRichiestaSupporto",
+      "getRichiesteSupportoMentore"
+    ]
+  },
+  "RegistrazionePage": {
+    "attributes": [
+      "utenteController"
+    ],
+    "operations": [
+      "compilaForm",
+      "confermaRegistrazione",
+      "mostraConferma",
+      "mostraErrore"
+    ]
+  },
+  "LoginPage": {
+    "attributes": [
+      "autenticazioneController"
+    ],
+    "operations": [
+      "inserisciCredenziali",
+      "clickLogin",
+      "mostraErrore"
+    ]
+  },
+  "TeamPage": {
+    "attributes": [
+      "teamController",
+      "invitoController"
+    ],
+    "operations": [
+      "inserisciNomeTeam",
+      "confermaCreazioneTeam",
+      "selezionaUtenteDaInvitare",
+      "inviaInvito",
+      "visualizzaInviti",
+      "accettaInvito",
+      "mostraConferma",
+      "mostraErrore",
+      "clickAbbandonaTeam",
+      "confermaAbbandono",
+      "refreshTeamInfo"
+    ]
+  },
+  "HackathonPage": {
+    "attributes": [
+      "hackathonController"
+    ],
+    "operations": [
+      "apriElencoHackathon",
+      "mostraElenco",
+      "selezionaHackathon",
+      "mostraErrore"
+    ]
+  },
+  "CreateHackathonPage": {
+    "attributes": [
+      "hackathonController"
+    ],
+    "operations": [
+      "compilaForm",
+      "confermaCreazioneHackathon",
+      "mostraConferma",
+      "mostraErrore"
+    ]
+  },
+  "HackathonDetailPage": {
+    "attributes": [
+      "hackathonController",
+      "pagamentoController"
+    ],
+    "operations": [
+      "selezionaHackathon",
+      "selezionaMentore",
+      "confermaAggiuntaMentore",
+      "confermaIscrizione",
+      "mostraConferma",
+      "mostraErrore",
+      "clickAggiornaStato",
+      "confermaNuovoStato",
+      "getDettaglioHackathon",
+      "getFormAggiornaStato",
+      "aggiornaStato",
+      "mostraFormAggiornaStato",
+      "clickErogaPremio",
+      "erogaPremio",
+      "clickProclamaVincitore",
+      "confermaVincitore",
+      "apriProclama",
+      "proclamaVincitore",
+      "mostraListaTeamCandidati"
+    ]
+  },
+  "SupportoPage": {
+    "attributes": [
+      "supportoController"
+    ],
+    "operations": [
+      "mostraRichieste",
+      "selezionaRichiesta",
+      "proponiCall",
+      "mostraConferma",
+      "mostraErrore"
+    ]
+  },
+  "PremiazionePage": {
+    "attributes": [
+      "hackathonController"
+    ],
+    "operations": [
+      "selezionaHackathon",
+      "selezionaTeamVincitore",
+      "confermaErogazionePremio",
+      "mostraConferma",
+      "mostraErrore"
+    ]
+  },
+  "Sottomissione": {
+    "attributes": [
+      "id",
+      "dataUltimoAggiornamento",
+      "dataInvio",
+      "titolo",
+      "descrizione",
+      "urlRepo",
+      "iscrizione"
+    ],
+    "operations": [
+      "updateSubmission",
+      "setDataUltimoAggiornamento",
+      "setDataInvio",
+      "getHackathonId"
+    ]
+  },
+  "CallSupporto": {
+    "attributes": [
+      "id",
+      "dataProposta",
+      "dataInizio",
+      "durataMin",
+      "calendarEventId",
+      "stato"
+    ],
+    "operations": [
+      "proponi",
+      "conferma",
+      "annulla"
+    ]
+  },
+  "SegnalazioneViolazione": {
+    "attributes": [
+      "id",
+      "dataSegnalazione",
+      "motivaizone",
+      "stato"
+    ],
+    "operations": []
+  },
+  "SegnalaViolazione": {
+    "attributes": [
+      "id",
+      "dataSegnalazione",
+      "motivazione",
+      "stato",
+      "hackathon",
+      "mentore"
+    ],
+    "operations": [
+      "invia",
+      "prendiInCarico",
+      "archivia"
+    ]
+  },
+  "StatoCall": {
+    "attributes": [
+      "PROPOSTA",
+      "CONFERMATA",
+      "ANNULLATA"
+    ],
+    "operations": []
+  },
+  "StatoSegnalazione": {
+    "attributes": [
+      "INVIATA",
+      "PRESA_IN_CARICO",
+      "ARCHIVIATA"
+    ],
+    "operations": []
+  },
+  "SubmissionService": {
+    "attributes": [
+      "iscrizioneRepository",
+      "sottomissioneRepository",
+      "assegnazioneStaffRepository",
+      "hackathonRepository",
+      "valutazioneRepository"
+    ],
+    "operations": [
+      "getSubmissionForm",
+      "caricaSottomissione",
+      "getSottomissioni",
+      "getDettaglioSottomissione",
+      "salvaValutazione",
+      "creaValutazione",
+      "aggiornaValutazione"
+    ]
+  },
+  "ViolationService": {
+    "attributes": [],
+    "operations": [
+      "segnalaViolazione"
+    ]
+  },
+  "NotificationService": {
+    "attributes": [],
+    "operations": [
+      "notificaOrganizzatore"
+    ]
+  },
+  "SottomissioneRepository": {
+    "attributes": [],
+    "operations": [
+      "findByIscrizioneId",
+      "findByHackathonIds",
+      "save",
+      "findById",
+      "findByHackathonId"
+    ]
+  },
+  "CallSupportoRepository": {
+    "attributes": [],
+    "operations": [
+      "findByRichiestaId",
+      "save"
+    ]
+  },
+  "SegnalazioneValidazioneRepository": {
+    "attributes": [],
+    "operations": [
+      "save",
+      "findByHackathonId"
+    ]
+  },
+  "SubmissionController": {
+    "attributes": [
+      "submissionService"
+    ],
+    "operations": [
+      "getSubmissionForm",
+      "salvaSubmission",
+      "getSottomissioniGiudice",
+      "getDettaglioSottomissione",
+      "salvaValutazione"
+    ]
+  },
+  "CallController": {
+    "attributes": [],
+    "operations": [
+      "proponiCall"
+    ]
+  },
+  "InvitoPage": {
+    "attributes": [
+      "invitoController"
+    ],
+    "operations": [
+      "visualizzaInviti",
+      "mostraElencoInviti",
+      "accettaInvito",
+      "mostraErrore",
+      "mostraConferma"
+    ]
+  },
+  "SubmissionPage": {
+    "attributes": [
+      "submissionController"
+    ],
+    "operations": [
+      "apriFormSottomissione",
+      "mostraFormSottomissione",
+      "submitSottomissione",
+      "mostraErrore",
+      "mostraConferma"
+    ]
+  },
+  "SupportRequestPage": {
+    "attributes": [
+      "supportoController"
+    ],
+    "operations": [
+      "selezionaHackathon",
+      "inserisciDescrizione",
+      "confermaInvioRichiesta",
+      "submitRichiestaSupporto",
+      "mostraErrore",
+      "mostraConferma"
+    ]
+  },
+  "MentoreDashboardPage": {
+    "attributes": [
+      "supportoController",
+      "callController"
+    ],
+    "operations": [
+      "apriRichiesteSupporto",
+      "renderListaRichieste",
+      "mostraListaVuota",
+      "selezionaRichiesta",
+      "apriFormProponiCall",
+      "confermaPropostaCall",
+      "mostraErrore",
+      "mostraConferma"
+    ]
+  },
+  "SubmissionListPage": {
+    "attributes": [
+      "submissionController"
+    ],
+    "operations": [
+      "apriSottomissioni",
+      "renderListaSottomissioni",
+      "mostraListaVuota",
+      "selezionaSottomissione",
+      "mostraDettaglio",
+      "confermaValutazione",
+      "getDettaglioSottomissione",
+      "salvaValutazione",
+      "mostraFormValutazione",
+      "mostraErrore",
+      "mostraConferma"
+    ]
+  },
+  "ViolationReportPage": {
+    "attributes": [
+      "violationController"
+    ],
+    "operations": [
+      "apriSegnalaViolazione",
+      "inserisciMotivazione",
+      "confermaInvio",
+      "segnalaViolazione",
+      "mostraErrore",
+      "mostraConferma"
+    ]
+  },
+  "Valutazione": {
+    "attributes": [
+      "id",
+      "dataValutazione",
+      "punteggio",
+      "giudizio"
+    ],
+    "operations": [
+      "aggiorna",
+      "isPunteggioValido"
+    ]
+  },
+  "Valutazione2": {
+    "attributes": [],
+    "operations": []
+  },
+  "EsitoHackathon": {
+    "attributes": [
+      "id",
+      "dataProclamazione",
+      "note"
+    ],
+    "operations": [
+      "isVincitoreProclamato",
+      "hasVincitore"
+    ]
+  },
+  "PagamentoPremio": {
+    "attributes": [
+      "id",
+      "dataPagamento",
+      "importo",
+      "paymentRef",
+      "stato"
+    ],
+    "operations": [
+      "isEseguito"
+    ]
+  },
+  "StatoPagamento": {
+    "attributes": [
+      "INVIATO",
+      "ESEGUITO",
+      "FALLITO"
+    ],
+    "operations": []
+  },
+  "ValutazioneRepository": {
+    "attributes": [],
+    "operations": [
+      "findBySottomissioneId",
+      "save",
+      "countNonValutate"
+    ]
+  },
+  "EsitoHackathonRepository": {
+    "attributes": [],
+    "operations": [
+      "findByHackathonId",
+      "save"
+    ]
+  },
+  "PagamentoPremioRepository": {
+    "attributes": [],
+    "operations": [
+      "findByHackathonId",
+      "save"
+    ]
+  },
+  "PagamentoController": {
+    "attributes": [
+      "pagamentoService"
+    ],
+    "operations": [
+      "erogaPremio"
+    ]
+  }
+}

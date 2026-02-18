@@ -24,13 +24,13 @@ public class ViolationController {
     private final ApiMapper mapper;
 
     @PostMapping("/{hackathonId}/violations")
-    public ResponseEntity<ViolationResponse> reportViolation(
+    public ResponseEntity<ViolationResponse> segnalaViolazione(
         @PathVariable Long hackathonId,
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody ReportViolationRequest request
     ) {
         ViolationResponse response = mapper.toResponse(
-            violationService.reportViolation(hackathonId, request.teamId(), currentUserId, request.reason())
+            violationService.segnalaViolazione(hackathonId, request.teamId(), currentUserId, request.reason())
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

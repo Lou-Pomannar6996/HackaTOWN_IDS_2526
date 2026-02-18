@@ -1,13 +1,13 @@
 package it.ids.hackathown.domain.state;
 
-import it.ids.hackathown.domain.entity.HackathonEntity;
+import it.ids.hackathown.domain.entity.Hackathon;
 
 public class HackathonContext {
 
-    private final HackathonEntity hackathon;
+    private final Hackathon hackathon;
     private final HackathonStateFactory stateFactory;
 
-    public HackathonContext(HackathonEntity hackathon, HackathonStateFactory stateFactory) {
+    public HackathonContext(Hackathon hackathon, HackathonStateFactory stateFactory) {
         this.hackathon = hackathon;
         this.stateFactory = stateFactory;
     }
@@ -57,6 +57,6 @@ public class HackathonContext {
     }
 
     private HackathonState currentState() {
-        return stateFactory.getState(hackathon.getStateEnum());
+        return stateFactory.getState(hackathon.getStato());
     }
 }

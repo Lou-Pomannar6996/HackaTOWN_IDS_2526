@@ -3,7 +3,7 @@ package it.ids.hackathown.api.controller;
 import it.ids.hackathown.api.dto.request.UpdateUserRolesRequest;
 import it.ids.hackathown.api.dto.response.UserResponse;
 import it.ids.hackathown.api.mapper.ApiMapper;
-import it.ids.hackathown.service.UserService;
+import it.ids.hackathown.service.UtenteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final UserService userService;
+    private final UtenteService utenteService;
     private final ApiMapper mapper;
 
     @PutMapping("/users/{userId}/roles")
@@ -26,6 +26,6 @@ public class AdminController {
         @PathVariable Long userId,
         @RequestBody UpdateUserRolesRequest request
     ) {
-        return mapper.toResponse(userService.assignRoles(currentUserId, userId, request.roles()));
+        return mapper.toResponse(utenteService.assignRoles(currentUserId, userId, request.roles()));
     }
 }

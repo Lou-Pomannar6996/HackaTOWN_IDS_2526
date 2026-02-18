@@ -1,6 +1,6 @@
 package it.ids.hackathown.domain.state;
 
-import it.ids.hackathown.domain.entity.HackathonEntity;
+import it.ids.hackathown.domain.entity.Hackathon;
 import it.ids.hackathown.domain.enums.HackathonStateType;
 import it.ids.hackathown.domain.exception.ForbiddenActionForState;
 
@@ -8,47 +8,47 @@ public interface HackathonState {
 
     HackathonStateType type();
 
-    default void registerTeam(HackathonEntity hackathon) {
+    default void registerTeam(Hackathon hackathon) {
         deny("registerTeam");
     }
 
-    default void submit(HackathonEntity hackathon) {
+    default void submit(Hackathon hackathon) {
         deny("submit");
     }
 
-    default void updateSubmission(HackathonEntity hackathon) {
+    default void updateSubmission(Hackathon hackathon) {
         deny("updateSubmission");
     }
 
-    default void judgeSubmission(HackathonEntity hackathon) {
+    default void judgeSubmission(Hackathon hackathon) {
         deny("judgeSubmission");
     }
 
-    default void declareWinner(HackathonEntity hackathon) {
+    default void declareWinner(Hackathon hackathon) {
         deny("declareWinner");
     }
 
-    default void addMentor(HackathonEntity hackathon) {
+    default void addMentor(Hackathon hackathon) {
         deny("addMentor");
     }
 
-    default void requestSupport(HackathonEntity hackathon) {
+    default void requestSupport(Hackathon hackathon) {
         deny("requestSupport");
     }
 
-    default void proposeCall(HackathonEntity hackathon) {
+    default void proposeCall(Hackathon hackathon) {
         deny("proposeCall");
     }
 
-    default void startHackathon(HackathonEntity hackathon) {
+    default void startHackathon(Hackathon hackathon) {
         deny("startHackathon");
     }
 
-    default void startEvaluation(HackathonEntity hackathon) {
+    default void startEvaluation(Hackathon hackathon) {
         deny("startEvaluation");
     }
 
-    default void markCompleted(HackathonEntity hackathon) {
+    default void markCompleted(Hackathon hackathon) {
         deny("markCompleted");
     }
 

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import it.ids.hackathown.domain.entity.HackathonEntity;
+import it.ids.hackathown.domain.entity.Hackathon;
 import it.ids.hackathown.domain.enums.HackathonStateType;
 import it.ids.hackathown.domain.exception.ForbiddenActionForState;
 import java.util.List;
@@ -27,20 +27,20 @@ class HackathonStateTest {
 
     @Test
     void registrationState_allowsRegistrationAndTransitionToRunning() {
-        HackathonEntity hackathon = new HackathonEntity();
-        hackathon.setStateEnum(HackathonStateType.ISCRIZIONI);
+        Hackathon hackathon = new Hackathon();
+        hackathon.setStato(HackathonStateType.ISCRIZIONI);
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
 
         assertDoesNotThrow(context::registerTeam);
         context.startHackathon();
 
-        assertEquals(HackathonStateType.IN_CORSO, hackathon.getStateEnum());
+        assertEquals(HackathonStateType.IN_CORSO, hackathon.getStato());
     }
 
     @Test
     void registrationState_blocksSubmission() {
-        HackathonEntity hackathon = new HackathonEntity();
-        hackathon.setStateEnum(HackathonStateType.ISCRIZIONI);
+        Hackathon hackathon = new Hackathon();
+        hackathon.setStato(HackathonStateType.ISCRIZIONI);
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
 
         assertThrows(ForbiddenActionForState.class, context::submit);
@@ -48,8 +48,8 @@ class HackathonStateTest {
 
     @Test
     void runningState_allowsSubmissionAndTransitionToEvaluation() {
-        HackathonEntity hackathon = new HackathonEntity();
-        hackathon.setStateEnum(HackathonStateType.IN_CORSO);
+        Hackathon hackathon = new Hackathon();
+        hackathon.setStato(HackathonStateType.IN_CORSO);
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
 
         assertDoesNotThrow(context::submit);
@@ -59,13 +59,13 @@ class HackathonStateTest {
 
         context.startEvaluation();
 
-        assertEquals(HackathonStateType.IN_VALUTAZIONE, hackathon.getStateEnum());
+        assertEquals(HackathonStateType.IN_VALUTAZIONE, hackathon.getStato());
     }
 
     @Test
     void evaluationState_allowsJudgingAndCompletion() {
-        HackathonEntity hackathon = new HackathonEntity();
-        hackathon.setStateEnum(HackathonStateType.IN_VALUTAZIONE);
+        Hackathon hackathon = new Hackathon();
+        hackathon.setStato(HackathonStateType.IN_VALUTAZIONE);
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
 
         assertDoesNotThrow(context::judgeSubmission);
@@ -73,13 +73,13 @@ class HackathonStateTest {
 
         context.markCompleted();
 
-        assertEquals(HackathonStateType.CONCLUSO, hackathon.getStateEnum());
+        assertEquals(HackathonStateType.CONCLUSO, hackathon.getStato());
     }
 
     @Test
     void completedState_blocksMutatingActions() {
-        HackathonEntity hackathon = new HackathonEntity();
-        hackathon.setStateEnum(HackathonStateType.CONCLUSO);
+        Hackathon hackathon = new Hackathon();
+        hackathon.setStato(HackathonStateType.CONCLUSO);
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
 
         assertThrows(ForbiddenActionForState.class, context::registerTeam);

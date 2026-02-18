@@ -1,15 +1,15 @@
 package it.ids.hackathown.service;
 
-import it.ids.hackathown.domain.entity.EvaluationEntity;
-import it.ids.hackathown.domain.entity.HackathonEntity;
-import it.ids.hackathown.domain.entity.SubmissionEntity;
-import it.ids.hackathown.domain.entity.UserEntity;
+import it.ids.hackathown.domain.entity.Valutazione;
+import it.ids.hackathown.domain.entity.Hackathon;
+import it.ids.hackathown.domain.entity.Sottomissione;
+import it.ids.hackathown.domain.entity.Utente;
 import it.ids.hackathown.domain.exception.DomainValidationException;
 import it.ids.hackathown.domain.state.HackathonContext;
 import it.ids.hackathown.domain.state.HackathonStateFactory;
 import it.ids.hackathown.domain.strategy.ScoringStrategyRegistry;
 import it.ids.hackathown.domain.strategy.scoring.ScoringInput;
-import it.ids.hackathown.repository.EvaluationRepository;
+import it.ids.hackathown.repository.ValutazioneRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class EvaluationService {
 
-    private final EvaluationRepository evaluationRepository;
+    private final ValutazioneRepository valutazioneRepository;
     private final ScoringStrategyRegistry scoringStrategyRegistry;
     private final HackathonStateFactory stateFactory;
     private final AccessControlService accessControlService;
 
     @Transactional
-    public EvaluationEntity evaluateSubmission(
+    public Valutazione evaluateSubmission(
         Long submissionId,
         Long currentUserId,
         BigDecimal judgeScore,
@@ -40,9 +40,9 @@ public class EvaluationService {
         validateScoreRange("innovationScore", innovationScore, false);
         validateScoreRange("technicalScore", technicalScore, false);
 
-        SubmissionEntity submission = accessControlService.requireSubmission(submissionId);
-        HackathonEntity hackathon = submission.getHackathon();
-        UserEntity judge = accessControlService.requireUser(currentUserId);
+        Sottomissione submission = accessControlService.requireSubmission(submissionId);
+        Hackathon hackathon = submission.getHackathon();
+        Utente judge = accessControlService.requireUser(currentUserId);
 
         accessControlService.assertJudge(hackathon, currentUserId);
 
@@ -52,25 +52,25 @@ public class EvaluationService {
         BigDecimal finalScore = scoringStrategyRegistry.getStrategy(hackathon.getScoringPolicyType())
             .computeScore(new ScoringInput(judgeScore, innovationScore, technicalScore));
 
-        EvaluationEntity evaluation = evaluationRepository.findBySubmission_Id(submissionId)
-            .orElseGet(EvaluationEntity::new);
+        Valutazione evaluation = valutazioneRepository.findBySubmission_Id(submissionId)
+            .orElseGet(Valutazione::new);
 
         evaluation.setHackathon(hackathon);
         evaluation.setSubmission(submission);
         evaluation.setJudge(judge);
-        evaluation.setScore0to10(finalScore);
-        evaluation.setComment(comment);
+        evaluation.setPunteggio(finalScore);
+        evaluation.setGiudizio(comment);
 
-        EvaluationEntity saved = evaluationRepository.save(evaluation);
+        Valutazione saved = valutazioneRepository.save(evaluation);
         log.info("Evaluation saved for submission {} by judge {}", submissionId, currentUserId);
         return saved;
     }
 
     @Transactional(readOnly = true)
-    public List<EvaluationEntity> listEvaluations(Long hackathonId, Long currentUserId) {
-        HackathonEntity hackathon = accessControlService.requireHackathon(hackathonId);
+    public List<Valutazione> listEvaluations(Long hackathonId, Long currentUserId) {
+        Hackathon hackathon = accessControlService.requireHackathon(hackathonId);
         accessControlService.assertOrganizerOrJudge(hackathon, currentUserId);
-        return evaluationRepository.findByHackathon_Id(hackathonId);
+        return valutazioneRepository.findByHackathon_Id(hackathonId);
     }
 
     private void validateScoreRange(String field, BigDecimal score, boolean required) {

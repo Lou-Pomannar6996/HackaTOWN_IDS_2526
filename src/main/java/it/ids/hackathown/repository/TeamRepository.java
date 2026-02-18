@@ -1,14 +1,14 @@
 package it.ids.hackathown.repository;
 
-import it.ids.hackathown.domain.entity.TeamEntity;
+import it.ids.hackathown.domain.entity.Team;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
+public interface TeamRepository extends JpaRepository<Team, Long> {
 
-    boolean existsByNameIgnoreCase(String name);
+    boolean existsByNomeIgnoreCase(String nome);
 
-    boolean existsByMembers_Id(Long userId);
+    boolean existsByMembri_Id(Long userId);
 
-    Optional<TeamEntity> findByMembers_Id(Long userId);
+    Optional<Team> findByMembri_Id(Long userId);
 }

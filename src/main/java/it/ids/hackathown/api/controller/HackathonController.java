@@ -29,7 +29,7 @@ public class HackathonController {
     private final ApiMapper mapper;
 
     @PostMapping
-    public ResponseEntity<HackathonResponse> createHackathon(
+    public ResponseEntity<HackathonResponse> creaHackathon(
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody CreateHackathonRequest request
     ) {
@@ -52,17 +52,17 @@ public class HackathonController {
     }
 
     @GetMapping
-    public List<HackathonResponse> listHackathons() {
+    public List<HackathonResponse> getElencoHackathon() {
         return hackathonService.listHackathons().stream().map(mapper::toResponse).toList();
     }
 
     @GetMapping("/{hackathonId}")
-    public HackathonResponse getHackathon(@PathVariable Long hackathonId) {
+    public HackathonResponse getDettaglioHackathon(@PathVariable Long hackathonId) {
         return mapper.toResponse(hackathonService.getHackathon(hackathonId));
     }
 
     @PostMapping("/{hackathonId}/mentors")
-    public HackathonResponse addMentor(
+    public HackathonResponse aggiungiMentore(
         @PathVariable Long hackathonId,
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody AddMentorRequest request
@@ -87,7 +87,7 @@ public class HackathonController {
     }
 
     @PostMapping("/{hackathonId}/declare-winner")
-    public WinnerResponse declareWinner(
+    public WinnerResponse proclamaVincitore(
         @PathVariable Long hackathonId,
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
     ) {

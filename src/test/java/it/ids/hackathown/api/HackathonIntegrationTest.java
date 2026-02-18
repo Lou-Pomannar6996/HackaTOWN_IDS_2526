@@ -9,16 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.ids.hackathown.domain.entity.CallProposalEntity;
-import it.ids.hackathown.domain.entity.EvaluationEntity;
-import it.ids.hackathown.domain.entity.HackathonEntity;
-import it.ids.hackathown.domain.entity.RegistrationEntity;
-import it.ids.hackathown.domain.entity.SubmissionEntity;
-import it.ids.hackathown.domain.entity.SupportRequestEntity;
-import it.ids.hackathown.domain.entity.TeamEntity;
-import it.ids.hackathown.domain.entity.UserEntity;
-import it.ids.hackathown.domain.entity.ViolationReportEntity;
-import it.ids.hackathown.domain.entity.WinnerEntity;
+import it.ids.hackathown.domain.entity.CallSupporto;
+import it.ids.hackathown.domain.entity.Valutazione;
+import it.ids.hackathown.domain.entity.Hackathon;
+import it.ids.hackathown.domain.entity.Iscrizione;
+import it.ids.hackathown.domain.entity.Sottomissione;
+import it.ids.hackathown.domain.entity.RichiestaSupporto;
+import it.ids.hackathown.domain.entity.Team;
+import it.ids.hackathown.domain.entity.Utente;
+import it.ids.hackathown.domain.entity.SegnalazioneViolazione;
+import it.ids.hackathown.domain.entity.EsitoHackathon;
 import it.ids.hackathown.domain.enums.CallProposalStatus;
 import it.ids.hackathown.domain.enums.HackathonStateType;
 import it.ids.hackathown.domain.enums.ScoringPolicyType;
@@ -26,16 +26,16 @@ import it.ids.hackathown.domain.enums.SubmissionStatus;
 import it.ids.hackathown.domain.enums.SupportRequestStatus;
 import it.ids.hackathown.domain.enums.UserRole;
 import it.ids.hackathown.domain.enums.ValidationPolicyType;
-import it.ids.hackathown.repository.CallProposalRepository;
-import it.ids.hackathown.repository.EvaluationRepository;
+import it.ids.hackathown.repository.CallSupportoRepository;
+import it.ids.hackathown.repository.ValutazioneRepository;
 import it.ids.hackathown.repository.HackathonRepository;
-import it.ids.hackathown.repository.RegistrationRepository;
-import it.ids.hackathown.repository.SubmissionRepository;
-import it.ids.hackathown.repository.SupportRequestRepository;
+import it.ids.hackathown.repository.IscrizioneRepository;
+import it.ids.hackathown.repository.SottomissioneRepository;
+import it.ids.hackathown.repository.RichiestaSupportoRepository;
 import it.ids.hackathown.repository.TeamRepository;
-import it.ids.hackathown.repository.UserRepository;
-import it.ids.hackathown.repository.ViolationReportRepository;
-import it.ids.hackathown.repository.WinnerRepository;
+import it.ids.hackathown.repository.UtenteRepository;
+import it.ids.hackathown.repository.SegnalazioneValidazioneRepository;
+import it.ids.hackathown.repository.EsitoHackathonRepository;
 import it.ids.hackathown.service.HackathonService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -63,7 +63,7 @@ class HackathonIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserRepository userRepository;
+    private UtenteRepository utenteRepository;
 
     @Autowired
     private TeamRepository teamRepository;
@@ -72,25 +72,25 @@ class HackathonIntegrationTest {
     private HackathonRepository hackathonRepository;
 
     @Autowired
-    private RegistrationRepository registrationRepository;
+    private IscrizioneRepository iscrizioneRepository;
 
     @Autowired
-    private SubmissionRepository submissionRepository;
+    private SottomissioneRepository sottomissioneRepository;
 
     @Autowired
-    private EvaluationRepository evaluationRepository;
+    private ValutazioneRepository valutazioneRepository;
 
     @Autowired
-    private WinnerRepository winnerRepository;
+    private EsitoHackathonRepository esitoHackathonRepository;
 
     @Autowired
-    private SupportRequestRepository supportRequestRepository;
+    private RichiestaSupportoRepository richiestaSupportoRepository;
 
     @Autowired
-    private CallProposalRepository callProposalRepository;
+    private CallSupportoRepository callSupportoRepository;
 
     @Autowired
-    private ViolationReportRepository violationReportRepository;
+    private SegnalazioneValidazioneRepository segnalazioneValidazioneRepository;
 
     @Autowired
     private HackathonService hackathonService;
@@ -102,15 +102,15 @@ class HackathonIntegrationTest {
 
     @Test
     void declareWinner_endpointSelectsBestSubmissionAndCompletesHackathon() throws Exception {
-        UserEntity organizer = saveUser("organizer@hackhub.dev", "Organizer", Set.of(UserRole.ORGANIZER));
-        UserEntity judge = saveUser("judge@hackhub.dev", "Judge", Set.of(UserRole.JUDGE));
-        UserEntity memberA = saveUser("member-a@hackhub.dev", "Member A", Set.of(UserRole.REGISTERED_USER));
-        UserEntity memberB = saveUser("member-b@hackhub.dev", "Member B", Set.of(UserRole.REGISTERED_USER));
+        Utente organizer = saveUser("organizer@hackhub.dev", "Organizer", Set.of(UserRole.ORGANIZER));
+        Utente judge = saveUser("judge@hackhub.dev", "Judge", Set.of(UserRole.JUDGE));
+        Utente memberA = saveUser("member-a@hackhub.dev", "Member A", Set.of(UserRole.REGISTERED_USER));
+        Utente memberB = saveUser("member-b@hackhub.dev", "Member B", Set.of(UserRole.REGISTERED_USER));
 
-        TeamEntity teamA = saveTeam("Alpha", 4, Set.of(memberA));
-        TeamEntity teamB = saveTeam("Beta", 4, Set.of(memberB));
+        Team teamA = saveTeam("Alpha", 4, Set.of(memberA));
+        Team teamB = saveTeam("Beta", 4, Set.of(memberB));
 
-        HackathonEntity hackathon = saveHackathon(
+        Hackathon hackathon = saveHackathon(
             "HackHub Finals",
             organizer,
             judge,
@@ -119,41 +119,41 @@ class HackathonIntegrationTest {
             ValidationPolicyType.BASIC
         );
 
-        registrationRepository.save(RegistrationEntity.builder().hackathon(hackathon).team(teamA).build());
-        registrationRepository.save(RegistrationEntity.builder().hackathon(hackathon).team(teamB).build());
+        iscrizioneRepository.save(Iscrizione.builder().hackathon(hackathon).team(teamA).build());
+        iscrizioneRepository.save(Iscrizione.builder().hackathon(hackathon).team(teamB).build());
 
-        SubmissionEntity subA = submissionRepository.save(SubmissionEntity.builder()
+        Sottomissione subA = sottomissioneRepository.save(Sottomissione.builder()
             .hackathon(hackathon)
             .team(teamA)
-            .repoUrl("https://github.com/org/alpha")
-            .description("Alpha project description long enough for validation")
-            .updatedAt(LocalDateTime.now().minusHours(2))
+            .urlRepo("https://github.com/org/alpha")
+            .descrizione("Alpha project description long enough for validation")
+            .dataUltimoAggiornamento(LocalDateTime.now().minusHours(2))
             .status(SubmissionStatus.VALIDATED)
             .build());
 
-        SubmissionEntity subB = submissionRepository.save(SubmissionEntity.builder()
+        Sottomissione subB = sottomissioneRepository.save(Sottomissione.builder()
             .hackathon(hackathon)
             .team(teamB)
-            .repoUrl("https://github.com/org/beta")
-            .description("Beta project description long enough for validation")
-            .updatedAt(LocalDateTime.now().minusHours(1))
+            .urlRepo("https://github.com/org/beta")
+            .descrizione("Beta project description long enough for validation")
+            .dataUltimoAggiornamento(LocalDateTime.now().minusHours(1))
             .status(SubmissionStatus.VALIDATED)
             .build());
 
-        evaluationRepository.save(EvaluationEntity.builder()
+        valutazioneRepository.save(Valutazione.builder()
             .hackathon(hackathon)
             .submission(subA)
             .judge(judge)
-            .score0to10(new BigDecimal("8.20"))
-            .comment("Strong")
+            .punteggio(new BigDecimal("8.20"))
+            .giudizio("Strong")
             .build());
 
-        evaluationRepository.save(EvaluationEntity.builder()
+        valutazioneRepository.save(Valutazione.builder()
             .hackathon(hackathon)
             .submission(subB)
             .judge(judge)
-            .score0to10(new BigDecimal("9.10"))
-            .comment("Excellent")
+            .punteggio(new BigDecimal("9.10"))
+            .giudizio("Excellent")
             .build());
 
         MvcResult result = mockMvc.perform(post("/api/hackathons/{hackathonId}/declare-winner", hackathon.getId())
@@ -164,11 +164,11 @@ class HackathonIntegrationTest {
             .andExpect(jsonPath("$.paymentTxId", startsWith("pay-")))
             .andReturn();
 
-        WinnerEntity winner = winnerRepository.findByHackathon_Id(hackathon.getId()).orElseThrow();
-        HackathonEntity updated = hackathonRepository.findById(hackathon.getId()).orElseThrow();
+        EsitoHackathon winner = esitoHackathonRepository.findByHackathon_Id(hackathon.getId()).orElseThrow();
+        Hackathon updated = hackathonRepository.findById(hackathon.getId()).orElseThrow();
 
         assertEquals(teamB.getId(), winner.getTeam().getId());
-        assertEquals(HackathonStateType.CONCLUSO, updated.getStateEnum());
+        assertEquals(HackathonStateType.CONCLUSO, updated.getStato());
 
         String payload = result.getResponse().getContentAsString();
         Map<?, ?> parsed = objectMapper.readValue(payload, Map.class);
@@ -177,13 +177,13 @@ class HackathonIntegrationTest {
 
     @Test
     void submitSubmission_endpointBlockedWhenHackathonNotRunning() throws Exception {
-        UserEntity organizer = saveUser("org2@hackhub.dev", "Organizer 2", Set.of(UserRole.ORGANIZER));
-        UserEntity judge = saveUser("judge2@hackhub.dev", "Judge 2", Set.of(UserRole.JUDGE));
-        UserEntity member = saveUser("member@hackhub.dev", "Member", Set.of(UserRole.REGISTERED_USER));
+        Utente organizer = saveUser("org2@hackhub.dev", "Organizer 2", Set.of(UserRole.ORGANIZER));
+        Utente judge = saveUser("judge2@hackhub.dev", "Judge 2", Set.of(UserRole.JUDGE));
+        Utente member = saveUser("member@hackhub.dev", "Member", Set.of(UserRole.REGISTERED_USER));
 
-        TeamEntity team = saveTeam("Gamma", 3, Set.of(member));
+        Team team = saveTeam("Gamma", 3, Set.of(member));
 
-        HackathonEntity hackathon = saveHackathon(
+        Hackathon hackathon = saveHackathon(
             "HackHub Qualifiers",
             organizer,
             judge,
@@ -192,7 +192,7 @@ class HackathonIntegrationTest {
             ValidationPolicyType.REPO_REQUIRED
         );
 
-        registrationRepository.save(RegistrationEntity.builder().hackathon(hackathon).team(team).build());
+        iscrizioneRepository.save(Iscrizione.builder().hackathon(hackathon).team(team).build());
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("repoUrl", "https://github.com/org/gamma");
@@ -208,13 +208,13 @@ class HackathonIntegrationTest {
 
     @Test
     void deleteHackathon_endpointDeletesHackathonAndRelatedData() throws Exception {
-        UserEntity organizer = saveUser("org-delete@hackhub.dev", "Organizer Delete", Set.of(UserRole.ORGANIZER));
-        UserEntity judge = saveUser("judge-delete@hackhub.dev", "Judge Delete", Set.of(UserRole.JUDGE));
-        UserEntity mentor = saveUser("mentor-delete@hackhub.dev", "Mentor Delete", Set.of(UserRole.MENTOR));
-        UserEntity member = saveUser("member-delete@hackhub.dev", "Member Delete", Set.of(UserRole.REGISTERED_USER));
+        Utente organizer = saveUser("org-delete@hackhub.dev", "Organizer Delete", Set.of(UserRole.ORGANIZER));
+        Utente judge = saveUser("judge-delete@hackhub.dev", "Judge Delete", Set.of(UserRole.JUDGE));
+        Utente mentor = saveUser("mentor-delete@hackhub.dev", "Mentor Delete", Set.of(UserRole.MENTOR));
+        Utente member = saveUser("member-delete@hackhub.dev", "Member Delete", Set.of(UserRole.REGISTERED_USER));
 
-        TeamEntity team = saveTeam("DeleteTeam", 4, Set.of(member));
-        HackathonEntity hackathon = saveHackathon(
+        Team team = saveTeam("DeleteTeam", 4, Set.of(member));
+        Hackathon hackathon = saveHackathon(
             "Hackathon To Delete",
             organizer,
             judge,
@@ -225,100 +225,103 @@ class HackathonIntegrationTest {
         hackathon.getMentors().add(mentor);
         hackathon = hackathonRepository.save(hackathon);
 
-        registrationRepository.save(RegistrationEntity.builder().hackathon(hackathon).team(team).build());
+        iscrizioneRepository.save(Iscrizione.builder().hackathon(hackathon).team(team).build());
 
-        SubmissionEntity submission = submissionRepository.save(SubmissionEntity.builder()
+        Sottomissione submission = sottomissioneRepository.save(Sottomissione.builder()
             .hackathon(hackathon)
             .team(team)
-            .repoUrl("https://github.com/org/delete-team")
-            .description("Submission to be deleted")
-            .updatedAt(LocalDateTime.now())
+            .urlRepo("https://github.com/org/delete-team")
+            .descrizione("Submission to be deleted")
+            .dataUltimoAggiornamento(LocalDateTime.now())
             .status(SubmissionStatus.SUBMITTED)
             .build());
 
-        evaluationRepository.save(EvaluationEntity.builder()
+        valutazioneRepository.save(Valutazione.builder()
             .hackathon(hackathon)
             .submission(submission)
             .judge(judge)
-            .score0to10(new BigDecimal("7.50"))
-            .comment("To be removed")
+            .punteggio(new BigDecimal("7.50"))
+            .giudizio("To be removed")
             .build());
 
-        supportRequestRepository.save(SupportRequestEntity.builder()
+        richiestaSupportoRepository.save(RichiestaSupporto.builder()
             .hackathon(hackathon)
             .team(team)
-            .message("Need help")
-            .status(SupportRequestStatus.OPEN)
+            .descrizione("Need help")
+            .stato(SupportRequestStatus.OPEN)
             .build());
 
-        callProposalRepository.save(CallProposalEntity.builder()
-            .hackathon(hackathon)
-            .team(team)
-            .mentor(mentor)
-            .proposedSlots("2026-03-10T10:00,2026-03-10T11:00")
-            .status(CallProposalStatus.PROPOSED)
-            .build());
-
-        violationReportRepository.save(ViolationReportEntity.builder()
+        callSupportoRepository.save(CallSupporto.builder()
             .hackathon(hackathon)
             .team(team)
             .mentor(mentor)
-            .reason("Violation for deletion test")
+            .dataInizio(LocalDateTime.now().plusDays(1))
+            .durataMin(30)
+            .stato(CallProposalStatus.PROPOSED)
             .build());
 
-        WinnerEntity winner = hackathonService.declareWinner(hackathon.getId(), organizer.getId());
+        segnalazioneValidazioneRepository.save(SegnalazioneViolazione.builder()
+            .hackathon(hackathon)
+            .team(team)
+            .mentor(mentor)
+            .motivaizone("Violation for deletion test")
+            .build());
+
+        EsitoHackathon winner = hackathonService.declareWinner(hackathon.getId(), organizer.getId());
 
         mockMvc.perform(delete("/api/hackathons/{hackathonId}", hackathon.getId())
                 .header("X-USER-ID", organizer.getId()))
             .andExpect(status().isNoContent());
 
         assertTrue(hackathonRepository.findById(hackathon.getId()).isEmpty());
-        assertTrue(registrationRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
-        assertTrue(submissionRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
-        assertTrue(evaluationRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
-        assertTrue(supportRequestRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
-        assertTrue(callProposalRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
-        assertTrue(violationReportRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
-        assertTrue(!winnerRepository.existsByHackathon_Id(winner.getHackathonId()));
+        assertTrue(iscrizioneRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(sottomissioneRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(valutazioneRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(richiestaSupportoRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(callSupportoRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(segnalazioneValidazioneRepository.findByHackathon_Id(hackathon.getId()).isEmpty());
+        assertTrue(!esitoHackathonRepository.existsByHackathon_Id(winner.getId()));
     }
 
-    private UserEntity saveUser(String email, String name, Set<UserRole> roles) {
-        UserEntity user = UserEntity.builder()
+    private Utente saveUser(String email, String nome, Set<UserRole> roles) {
+        Utente user = Utente.builder()
             .email(email)
-            .name(name)
+            .nome(nome)
+            .cognome("Test")
+            .password("pwd")
             .roles(new HashSet<>(roles))
             .build();
-        return userRepository.save(user);
+        return utenteRepository.save(user);
     }
 
-    private TeamEntity saveTeam(String name, int maxSize, Set<UserEntity> members) {
-        TeamEntity team = TeamEntity.builder()
-            .name(name)
-            .maxSize(maxSize)
-            .members(new HashSet<>(members))
+    private Team saveTeam(String name, int maxSize, Set<Utente> members) {
+        Team team = Team.builder()
+            .nome(name)
+            .maxMembri(maxSize)
+            .membri(new HashSet<>(members))
             .build();
         return teamRepository.save(team);
     }
 
-    private HackathonEntity saveHackathon(
+    private Hackathon saveHackathon(
         String name,
-        UserEntity organizer,
-        UserEntity judge,
+        Utente organizer,
+        Utente judge,
         HackathonStateType state,
         ScoringPolicyType scoringPolicy,
         ValidationPolicyType validationPolicy
     ) {
         LocalDateTime now = LocalDateTime.now();
-        HackathonEntity hackathon = HackathonEntity.builder()
-            .name(name)
-            .rules("Rules")
-            .registrationDeadline(now.plusDays(1))
-            .startDate(now.plusDays(2))
-            .endDate(now.plusDays(3))
-            .location("Milan")
-            .prizeMoney(new BigDecimal("1000.00"))
+        Hackathon hackathon = Hackathon.builder()
+            .nome(name)
+            .regolamento("Rules")
+            .scadenzaIscrizioni(now.plusDays(1))
+            .dataInizio(now.plusDays(2))
+            .dataFine(now.plusDays(3))
+            .luogo("Milan")
+            .premio(new BigDecimal("1000.00"))
             .maxTeamSize(5)
-            .stateEnum(state)
+            .stato(state)
             .scoringPolicyType(scoringPolicy)
             .validationPolicyType(validationPolicy)
             .organizer(organizer)
@@ -329,15 +332,15 @@ class HackathonIntegrationTest {
     }
 
     private void cleanupAll() {
-        winnerRepository.deleteAll();
-        evaluationRepository.deleteAll();
-        callProposalRepository.deleteAll();
-        supportRequestRepository.deleteAll();
-        violationReportRepository.deleteAll();
-        submissionRepository.deleteAll();
-        registrationRepository.deleteAll();
+        esitoHackathonRepository.deleteAll();
+        valutazioneRepository.deleteAll();
+        callSupportoRepository.deleteAll();
+        richiestaSupportoRepository.deleteAll();
+        segnalazioneValidazioneRepository.deleteAll();
+        sottomissioneRepository.deleteAll();
+        iscrizioneRepository.deleteAll();
         hackathonRepository.deleteAll();
         teamRepository.deleteAll();
-        userRepository.deleteAll();
+        utenteRepository.deleteAll();
     }
 }

@@ -11,34 +11,34 @@ import it.ids.hackathown.api.dto.response.TeamResponse;
 import it.ids.hackathown.api.dto.response.UserResponse;
 import it.ids.hackathown.api.dto.response.ViolationResponse;
 import it.ids.hackathown.api.dto.response.WinnerResponse;
-import it.ids.hackathown.domain.entity.CallProposalEntity;
-import it.ids.hackathown.domain.entity.EvaluationEntity;
-import it.ids.hackathown.domain.entity.HackathonEntity;
-import it.ids.hackathown.domain.entity.RegistrationEntity;
-import it.ids.hackathown.domain.entity.SubmissionEntity;
-import it.ids.hackathown.domain.entity.SupportRequestEntity;
-import it.ids.hackathown.domain.entity.TeamEntity;
-import it.ids.hackathown.domain.entity.TeamInviteEntity;
-import it.ids.hackathown.domain.entity.UserEntity;
-import it.ids.hackathown.domain.entity.ViolationReportEntity;
-import it.ids.hackathown.domain.entity.WinnerEntity;
+import it.ids.hackathown.domain.entity.CallSupporto;
+import it.ids.hackathown.domain.entity.Valutazione;
+import it.ids.hackathown.domain.entity.Hackathon;
+import it.ids.hackathown.domain.entity.Iscrizione;
+import it.ids.hackathown.domain.entity.Sottomissione;
+import it.ids.hackathown.domain.entity.RichiestaSupporto;
+import it.ids.hackathown.domain.entity.Team;
+import it.ids.hackathown.domain.entity.Invito;
+import it.ids.hackathown.domain.entity.Utente;
+import it.ids.hackathown.domain.entity.SegnalazioneViolazione;
+import it.ids.hackathown.domain.entity.EsitoHackathon;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ApiMapper {
 
-    public HackathonResponse toResponse(HackathonEntity hackathon) {
+    public HackathonResponse toResponse(Hackathon hackathon) {
         return new HackathonResponse(
             hackathon.getId(),
-            hackathon.getName(),
-            hackathon.getRules(),
-            hackathon.getRegistrationDeadline(),
-            hackathon.getStartDate(),
-            hackathon.getEndDate(),
-            hackathon.getLocation(),
-            hackathon.getPrizeMoney(),
+            hackathon.getNome(),
+            hackathon.getRegolamento(),
+            hackathon.getScadenzaIscrizioni(),
+            hackathon.getDataInizio(),
+            hackathon.getDataFine(),
+            hackathon.getLuogo(),
+            hackathon.getPremio(),
             hackathon.getMaxTeamSize(),
-            hackathon.getStateEnum(),
+            hackathon.getStato(),
             hackathon.getScoringPolicyType(),
             hackathon.getValidationPolicyType(),
             hackathon.getOrganizer().getId(),
@@ -46,104 +46,108 @@ public class ApiMapper {
         );
     }
 
-    public TeamResponse toResponse(TeamEntity team) {
-        return new TeamResponse(team.getId(), team.getName(), team.getMaxSize());
+    public TeamResponse toResponse(Team team) {
+        return new TeamResponse(team.getId(), team.getNome(), team.getMaxMembri());
     }
 
-    public UserResponse toResponse(UserEntity user) {
+    public UserResponse toResponse(Utente user) {
+        String nomeCompleto = user.getNome() + " " + user.getCognome();
         return new UserResponse(
             user.getId(),
             user.getEmail(),
-            user.getName(),
+            nomeCompleto.trim(),
             user.getRoles()
         );
     }
 
-    public InviteResponse toResponse(TeamInviteEntity invite) {
+    public InviteResponse toResponse(Invito invite) {
+        String email = invite.getDestinatario() == null ? null : invite.getDestinatario().getEmail();
         return new InviteResponse(
             invite.getId(),
             invite.getTeam().getId(),
-            invite.getInvitedEmail(),
-            invite.getStatus(),
-            invite.getCreatedAt()
+            email,
+            invite.getStato(),
+            invite.getDataInvio()
         );
     }
 
-    public RegistrationResponse toResponse(RegistrationEntity registration) {
+    public RegistrationResponse toResponse(Iscrizione registration) {
         return new RegistrationResponse(
             registration.getId(),
             registration.getHackathon().getId(),
             registration.getTeam().getId(),
-            registration.getCreatedAt()
+            registration.getDataIscrizione()
         );
     }
 
-    public SubmissionResponse toResponse(SubmissionEntity submission) {
+    public SubmissionResponse toResponse(Sottomissione submission) {
         return new SubmissionResponse(
             submission.getId(),
             submission.getHackathon().getId(),
             submission.getTeam().getId(),
-            submission.getRepoUrl(),
+            submission.getUrlRepo(),
             submission.getFileRef(),
-            submission.getDescription(),
-            submission.getUpdatedAt(),
+            submission.getDescrizione(),
+            submission.getDataUltimoAggiornamento(),
             submission.getStatus()
         );
     }
 
-    public SupportRequestResponse toResponse(SupportRequestEntity supportRequest) {
+    public SupportRequestResponse toResponse(RichiestaSupporto supportRequest) {
         return new SupportRequestResponse(
             supportRequest.getId(),
             supportRequest.getHackathon().getId(),
             supportRequest.getTeam().getId(),
-            supportRequest.getMessage(),
-            supportRequest.getCreatedAt(),
-            supportRequest.getStatus()
+            supportRequest.getDescrizione(),
+            supportRequest.getDataRichiesta(),
+            supportRequest.getStato()
         );
     }
 
-    public CallProposalResponse toResponse(CallProposalEntity proposal) {
+    public CallProposalResponse toResponse(CallSupporto proposal) {
+        String slot = proposal.getDataInizio() == null ? null
+            : proposal.getDataInizio() + " (" + proposal.getDurataMin() + " min)";
         return new CallProposalResponse(
             proposal.getId(),
             proposal.getHackathon().getId(),
             proposal.getTeam().getId(),
             proposal.getMentor().getId(),
-            proposal.getProposedSlots(),
-            proposal.getCalendarBookingId(),
-            proposal.getStatus(),
-            proposal.getCreatedAt()
+            slot,
+            proposal.getCalendarEventId(),
+            proposal.getStato(),
+            proposal.getDataProposta()
         );
     }
 
-    public EvaluationResponse toResponse(EvaluationEntity evaluation) {
+    public EvaluationResponse toResponse(Valutazione evaluation) {
         return new EvaluationResponse(
             evaluation.getId(),
             evaluation.getHackathon().getId(),
             evaluation.getSubmission().getId(),
             evaluation.getJudge().getId(),
-            evaluation.getScore0to10(),
-            evaluation.getComment(),
-            evaluation.getCreatedAt()
+            evaluation.getPunteggio(),
+            evaluation.getGiudizio(),
+            evaluation.getDataValutazione()
         );
     }
 
-    public ViolationResponse toResponse(ViolationReportEntity violation) {
+    public ViolationResponse toResponse(SegnalazioneViolazione violation) {
         return new ViolationResponse(
             violation.getId(),
             violation.getHackathon().getId(),
             violation.getTeam().getId(),
             violation.getMentor().getId(),
-            violation.getReason(),
-            violation.getCreatedAt()
+            violation.getMotivaizone(),
+            violation.getDataSegnalazione()
         );
     }
 
-    public WinnerResponse toResponse(WinnerEntity winner) {
+    public WinnerResponse toResponse(EsitoHackathon winner) {
         return new WinnerResponse(
-            winner.getHackathonId(),
+            winner.getId(),
             winner.getTeam().getId(),
-            winner.getDeclaredAt(),
-            winner.getPaymentTxId()
+            winner.getDataProclamazione(),
+            winner.getNote()
         );
     }
 }

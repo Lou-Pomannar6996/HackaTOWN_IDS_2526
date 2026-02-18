@@ -1,10 +1,10 @@
 package it.ids.hackathown.service;
 
-import it.ids.hackathown.domain.entity.EvaluationEntity;
-import it.ids.hackathown.domain.entity.HackathonEntity;
-import it.ids.hackathown.domain.entity.SubmissionEntity;
-import it.ids.hackathown.domain.entity.UserEntity;
-import it.ids.hackathown.domain.entity.WinnerEntity;
+import it.ids.hackathown.domain.entity.Valutazione;
+import it.ids.hackathown.domain.entity.Hackathon;
+import it.ids.hackathown.domain.entity.Sottomissione;
+import it.ids.hackathown.domain.entity.Utente;
+import it.ids.hackathown.domain.entity.EsitoHackathon;
 import it.ids.hackathown.domain.enums.HackathonStateType;
 import it.ids.hackathown.domain.enums.ScoringPolicyType;
 import it.ids.hackathown.domain.enums.UserRole;
@@ -14,15 +14,15 @@ import it.ids.hackathown.domain.exception.DomainValidationException;
 import it.ids.hackathown.domain.state.HackathonContext;
 import it.ids.hackathown.domain.state.HackathonStateFactory;
 import it.ids.hackathown.integration.payment.PaymentGateway;
-import it.ids.hackathown.repository.EvaluationRepository;
+import it.ids.hackathown.repository.ValutazioneRepository;
 import it.ids.hackathown.repository.HackathonRepository;
-import it.ids.hackathown.repository.CallProposalRepository;
-import it.ids.hackathown.repository.RegistrationRepository;
-import it.ids.hackathown.repository.SubmissionRepository;
-import it.ids.hackathown.repository.SupportRequestRepository;
-import it.ids.hackathown.repository.UserRepository;
-import it.ids.hackathown.repository.ViolationReportRepository;
-import it.ids.hackathown.repository.WinnerRepository;
+import it.ids.hackathown.repository.CallSupportoRepository;
+import it.ids.hackathown.repository.IscrizioneRepository;
+import it.ids.hackathown.repository.SottomissioneRepository;
+import it.ids.hackathown.repository.RichiestaSupportoRepository;
+import it.ids.hackathown.repository.UtenteRepository;
+import it.ids.hackathown.repository.SegnalazioneValidazioneRepository;
+import it.ids.hackathown.repository.EsitoHackathonRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,57 +43,57 @@ import org.springframework.transaction.annotation.Transactional;
 public class HackathonService {
 
     private final HackathonRepository hackathonRepository;
-    private final UserRepository userRepository;
-    private final RegistrationRepository registrationRepository;
-    private final SubmissionRepository submissionRepository;
-    private final EvaluationRepository evaluationRepository;
-    private final SupportRequestRepository supportRequestRepository;
-    private final CallProposalRepository callProposalRepository;
-    private final ViolationReportRepository violationReportRepository;
-    private final WinnerRepository winnerRepository;
+    private final UtenteRepository utenteRepository;
+    private final IscrizioneRepository iscrizioneRepository;
+    private final SottomissioneRepository sottomissioneRepository;
+    private final ValutazioneRepository valutazioneRepository;
+    private final RichiestaSupportoRepository richiestaSupportoRepository;
+    private final CallSupportoRepository callSupportoRepository;
+    private final SegnalazioneValidazioneRepository segnalazioneValidazioneRepository;
+    private final EsitoHackathonRepository esitoHackathonRepository;
     private final PaymentGateway paymentGateway;
     private final HackathonStateFactory stateFactory;
     private final AccessControlService accessControlService;
 
     @Transactional
-    public HackathonEntity createHackathon(
+    public Hackathon createHackathon(
         Long currentUserId,
-        String name,
-        String rules,
-        LocalDateTime registrationDeadline,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
-        String location,
-        BigDecimal prizeMoney,
+        String nome,
+        String regolamento,
+        LocalDateTime scadenzaIscrizioni,
+        LocalDateTime dataInizio,
+        LocalDateTime dataFine,
+        String luogo,
+        BigDecimal premio,
         Integer maxTeamSize,
         Long judgeUserId,
         List<Long> mentorUserIds,
         ScoringPolicyType scoringPolicyType,
         ValidationPolicyType validationPolicyType
     ) {
-        UserEntity organizer = accessControlService.requireUser(currentUserId);
+        Utente organizer = accessControlService.requireUser(currentUserId);
         accessControlService.assertUserRole(organizer, UserRole.ORGANIZER);
 
-        UserEntity judge = accessControlService.requireUser(judgeUserId);
+        Utente judge = accessControlService.requireUser(judgeUserId);
         accessControlService.assertUserRole(judge, UserRole.JUDGE);
         if (organizer.getId().equals(judge.getId())) {
             throw new DomainValidationException("Organizer and judge must be different users");
         }
 
-        validateDates(registrationDeadline, startDate, endDate);
+        validateDates(scadenzaIscrizioni, dataInizio, dataFine);
 
-        Set<UserEntity> mentors = loadMentors(mentorUserIds);
+        Set<Utente> mentors = loadMentors(mentorUserIds);
 
-        HackathonEntity hackathon = HackathonEntity.builder()
-            .name(name)
-            .rules(rules)
-            .registrationDeadline(registrationDeadline)
-            .startDate(startDate)
-            .endDate(endDate)
-            .location(location)
-            .prizeMoney(prizeMoney)
+        Hackathon hackathon = Hackathon.builder()
+            .nome(nome)
+            .regolamento(regolamento)
+            .scadenzaIscrizioni(scadenzaIscrizioni)
+            .dataInizio(dataInizio)
+            .dataFine(dataFine)
+            .luogo(luogo)
+            .premio(premio)
             .maxTeamSize(maxTeamSize)
-            .stateEnum(HackathonStateType.ISCRIZIONI)
+            .stato(HackathonStateType.ISCRIZIONI)
             .scoringPolicyType(scoringPolicyType)
             .validationPolicyType(validationPolicyType)
             .organizer(organizer)
@@ -101,99 +101,99 @@ public class HackathonService {
             .mentors(mentors)
             .build();
 
-        HackathonEntity saved = hackathonRepository.save(hackathon);
+        Hackathon saved = hackathonRepository.save(hackathon);
         log.info("Created hackathon {} by organizer {}", saved.getId(), currentUserId);
         return saved;
     }
 
     @Transactional(readOnly = true)
-    public List<HackathonEntity> listHackathons() {
+    public List<Hackathon> listHackathons() {
         return hackathonRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public HackathonEntity getHackathon(Long hackathonId) {
+    public Hackathon getHackathon(Long hackathonId) {
         return accessControlService.requireHackathon(hackathonId);
     }
 
     @Transactional
-    public HackathonEntity addMentor(Long hackathonId, Long mentorUserId, Long currentUserId) {
-        HackathonEntity hackathon = accessControlService.requireHackathon(hackathonId);
+    public Hackathon addMentor(Long hackathonId, Long mentorUserId, Long currentUserId) {
+        Hackathon hackathon = accessControlService.requireHackathon(hackathonId);
         accessControlService.assertOrganizer(hackathon, currentUserId);
 
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
         context.addMentor();
 
-        UserEntity mentor = accessControlService.requireUser(mentorUserId);
+        Utente mentor = accessControlService.requireUser(mentorUserId);
         accessControlService.assertUserRole(mentor, UserRole.MENTOR);
         hackathon.getMentors().add(mentor);
 
-        HackathonEntity saved = hackathonRepository.save(hackathon);
+        Hackathon saved = hackathonRepository.save(hackathon);
         log.info("Added mentor {} to hackathon {}", mentorUserId, hackathonId);
         return saved;
     }
 
     @Transactional
-    public HackathonEntity startHackathon(Long hackathonId, Long currentUserId) {
-        HackathonEntity hackathon = accessControlService.requireHackathon(hackathonId);
+    public Hackathon startHackathon(Long hackathonId, Long currentUserId) {
+        Hackathon hackathon = accessControlService.requireHackathon(hackathonId);
         accessControlService.assertOrganizer(hackathon, currentUserId);
 
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
         context.startHackathon();
 
-        HackathonEntity saved = hackathonRepository.save(hackathon);
+        Hackathon saved = hackathonRepository.save(hackathon);
         log.info("Hackathon {} moved to IN_CORSO", hackathonId);
         return saved;
     }
 
     @Transactional
-    public HackathonEntity startEvaluation(Long hackathonId, Long currentUserId) {
-        HackathonEntity hackathon = accessControlService.requireHackathon(hackathonId);
+    public Hackathon startEvaluation(Long hackathonId, Long currentUserId) {
+        Hackathon hackathon = accessControlService.requireHackathon(hackathonId);
         accessControlService.assertOrganizer(hackathon, currentUserId);
 
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
         context.startEvaluation();
 
-        HackathonEntity saved = hackathonRepository.save(hackathon);
+        Hackathon saved = hackathonRepository.save(hackathon);
         log.info("Hackathon {} moved to IN_VALUTAZIONE", hackathonId);
         return saved;
     }
 
     @Transactional
-    public WinnerEntity declareWinner(Long hackathonId, Long currentUserId) {
-        HackathonEntity hackathon = accessControlService.requireHackathon(hackathonId);
+    public EsitoHackathon declareWinner(Long hackathonId, Long currentUserId) {
+        Hackathon hackathon = accessControlService.requireHackathon(hackathonId);
         accessControlService.assertOrganizer(hackathon, currentUserId);
 
-        if (winnerRepository.existsByHackathon_Id(hackathonId)) {
+        if (esitoHackathonRepository.existsByHackathon_Id(hackathonId)) {
             throw new ConflictException("Winner already declared for hackathon " + hackathonId);
         }
 
         HackathonContext context = new HackathonContext(hackathon, stateFactory);
         context.declareWinner();
 
-        List<SubmissionEntity> submissions = submissionRepository.findByHackathon_Id(hackathonId);
+        List<Sottomissione> submissions = sottomissioneRepository.findByHackathon_Id(hackathonId);
         if (submissions.isEmpty()) {
             throw new DomainValidationException("Cannot declare winner: no submissions found");
         }
 
-        List<EvaluationEntity> evaluations = evaluationRepository.findByHackathon_Id(hackathonId);
-        Map<Long, EvaluationEntity> bySubmissionId = new HashMap<>();
+        List<Valutazione> evaluations = valutazioneRepository.findByHackathon_Id(hackathonId);
+        Map<Long, Valutazione> bySubmissionId = new HashMap<>();
         evaluations.forEach(eval -> bySubmissionId.put(eval.getSubmission().getId(), eval));
 
         boolean missingEvaluation = submissions.stream()
-            .map(SubmissionEntity::getId)
+            .map(Sottomissione::getId)
             .anyMatch(submissionId -> !bySubmissionId.containsKey(submissionId));
 
         if (missingEvaluation) {
             throw new DomainValidationException("Cannot declare winner: all submissions must be evaluated");
         }
 
-        Comparator<SubmissionEntity> comparator = Comparator
-            .comparing((SubmissionEntity submission) -> bySubmissionId.get(submission.getId()).getScore0to10(), Comparator.reverseOrder())
-            .thenComparing(SubmissionEntity::getUpdatedAt)
+        Comparator<Sottomissione> comparator = Comparator
+            .comparing((Sottomissione submission) -> bySubmissionId.get(submission.getId()).getPunteggio(), Comparator.reverseOrder())
+            .thenComparing(Sottomissione::getDataUltimoAggiornamento)
             .thenComparing(submission -> submission.getTeam().getId());
 
-        SubmissionEntity winningSubmission = submissions.stream()
+        Sottomissione winningSubmission = submissions.stream()
             .sorted(comparator)
             .findFirst()
             .orElseThrow(() -> new DomainValidationException("Cannot select winner"));
@@ -201,16 +201,16 @@ public class HackathonService {
         String paymentTxId = paymentGateway.issuePrizePayment(
             hackathonId,
             winningSubmission.getTeam().getId(),
-            hackathon.getPrizeMoney()
+            hackathon.getPremio()
         );
 
-        WinnerEntity winner = WinnerEntity.builder()
+        EsitoHackathon winner = EsitoHackathon.builder()
             .hackathon(hackathon)
             .team(winningSubmission.getTeam())
-            .paymentTxId(paymentTxId)
+            .note(paymentTxId)
             .build();
 
-        WinnerEntity savedWinner = winnerRepository.save(winner);
+        EsitoHackathon savedWinner = esitoHackathonRepository.save(winner);
         context.markCompleted();
         hackathonRepository.save(hackathon);
 
@@ -220,16 +220,16 @@ public class HackathonService {
 
     @Transactional
     public void deleteHackathon(Long hackathonId, Long currentUserId) {
-        HackathonEntity hackathon = accessControlService.requireHackathon(hackathonId);
+        Hackathon hackathon = accessControlService.requireHackathon(hackathonId);
         accessControlService.assertOrganizer(hackathon, currentUserId);
 
-        winnerRepository.deleteByHackathon_Id(hackathonId);
-        evaluationRepository.deleteByHackathon_Id(hackathonId);
-        callProposalRepository.deleteByHackathon_Id(hackathonId);
-        supportRequestRepository.deleteByHackathon_Id(hackathonId);
-        violationReportRepository.deleteByHackathon_Id(hackathonId);
-        submissionRepository.deleteByHackathon_Id(hackathonId);
-        registrationRepository.deleteByHackathon_Id(hackathonId);
+        esitoHackathonRepository.deleteByHackathon_Id(hackathonId);
+        valutazioneRepository.deleteByHackathon_Id(hackathonId);
+        callSupportoRepository.deleteByHackathon_Id(hackathonId);
+        richiestaSupportoRepository.deleteByHackathon_Id(hackathonId);
+        segnalazioneValidazioneRepository.deleteByHackathon_Id(hackathonId);
+        sottomissioneRepository.deleteByHackathon_Id(hackathonId);
+        iscrizioneRepository.deleteByHackathon_Id(hackathonId);
 
         hackathon.getMentors().clear();
         hackathonRepository.save(hackathon);
@@ -238,21 +238,74 @@ public class HackathonService {
         log.info("Deleted hackathon {}", hackathonId);
     }
 
-    private void validateDates(LocalDateTime registrationDeadline, LocalDateTime startDate, LocalDateTime endDate) {
-        if (registrationDeadline.isAfter(startDate)) {
+    @Transactional
+    public Hackathon creaHackathon(
+        Long currentUserId,
+        String nome,
+        String regolamento,
+        LocalDateTime scadenzaIscrizioni,
+        LocalDateTime dataInizio,
+        LocalDateTime dataFine,
+        String luogo,
+        BigDecimal premio,
+        Integer maxTeamSize,
+        Long judgeUserId,
+        List<Long> mentorUserIds,
+        ScoringPolicyType scoringPolicyType,
+        ValidationPolicyType validationPolicyType
+    ) {
+        return createHackathon(
+            currentUserId,
+            nome,
+            regolamento,
+            scadenzaIscrizioni,
+            dataInizio,
+            dataFine,
+            luogo,
+            premio,
+            maxTeamSize,
+            judgeUserId,
+            mentorUserIds,
+            scoringPolicyType,
+            validationPolicyType
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Hackathon> listaHackathonPubblici() {
+        return listHackathons();
+    }
+
+    @Transactional(readOnly = true)
+    public Hackathon getDettaglioHackathon(Long hackathonId) {
+        return getHackathon(hackathonId);
+    }
+
+    @Transactional
+    public Hackathon aggiungiMentore(Long hackathonId, Long mentorUserId, Long currentUserId) {
+        return addMentor(hackathonId, mentorUserId, currentUserId);
+    }
+
+    @Transactional
+    public EsitoHackathon proclamaVincitore(Long hackathonId, Long currentUserId) {
+        return declareWinner(hackathonId, currentUserId);
+    }
+
+    private void validateDates(LocalDateTime scadenzaIscrizioni, LocalDateTime dataInizio, LocalDateTime dataFine) {
+        if (scadenzaIscrizioni.isAfter(dataInizio)) {
             throw new DomainValidationException("registrationDeadline must be before or equal to startDate");
         }
-        if (startDate.isAfter(endDate)) {
+        if (dataInizio.isAfter(dataFine)) {
             throw new DomainValidationException("startDate must be before or equal to endDate");
         }
     }
 
-    private Set<UserEntity> loadMentors(List<Long> mentorUserIds) {
+    private Set<Utente> loadMentors(List<Long> mentorUserIds) {
         if (mentorUserIds == null || mentorUserIds.isEmpty()) {
             return new HashSet<>();
         }
         List<Long> uniqueIds = new ArrayList<>(new HashSet<>(mentorUserIds));
-        List<UserEntity> mentors = userRepository.findAllById(uniqueIds);
+        List<Utente> mentors = utenteRepository.findAllById(uniqueIds);
         if (mentors.size() != uniqueIds.size()) {
             throw new DomainValidationException("Some mentor IDs do not exist");
         }
