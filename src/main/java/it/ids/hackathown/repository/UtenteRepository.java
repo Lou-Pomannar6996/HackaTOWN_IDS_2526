@@ -9,4 +9,6 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     Optional<Utente> findByEmailIgnoreCase(String email);
 
     boolean existsByEmailIgnoreCase(String email);
+
+    long countByTeamCorrente_Id(Long teamId);
 }

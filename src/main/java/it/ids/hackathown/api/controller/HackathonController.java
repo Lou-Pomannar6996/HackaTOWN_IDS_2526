@@ -36,17 +36,14 @@ public class HackathonController {
         HackathonResponse response = mapper.toResponse(hackathonService.createHackathon(
             currentUserId,
             request.name(),
+            request.description(),
             request.rules(),
             request.registrationDeadline(),
             request.startDate(),
             request.endDate(),
             request.location(),
             request.prizeMoney(),
-            request.maxTeamSize(),
-            request.judgeUserId(),
-            request.mentorUserIds(),
-            request.scoringPolicyType(),
-            request.validationPolicyType()
+            request.maxTeamSize()
         ));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

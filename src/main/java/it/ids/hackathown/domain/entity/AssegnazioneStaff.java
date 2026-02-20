@@ -28,7 +28,7 @@ public class AssegnazioneStaff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
     private String ruolo;
@@ -44,18 +44,15 @@ public class AssegnazioneStaff {
     @JoinColumn(name = "staff_id")
     private Utente staff;
 
-    @PrePersist
-    void prePersist() {
-        if (dataAssegnazione == null) {
-            dataAssegnazione = LocalDateTime.now();
-        }
-    }
-
     public boolean isMentore() {
         return "MENTORE".equalsIgnoreCase(ruolo);
     }
 
     public boolean isGiudice() {
         return "GIUDICE".equalsIgnoreCase(ruolo);
+    }
+    
+    public boolean isOrganizzatore() {
+        return "ORGANIZZATORE".equalsIgnoreCase(ruolo);
     }
 }

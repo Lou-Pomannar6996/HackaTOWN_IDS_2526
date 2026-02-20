@@ -1,15 +1,15 @@
 package it.ids.hackathown.domain.state;
 
 import it.ids.hackathown.domain.entity.Hackathon;
-import it.ids.hackathown.domain.enums.HackathonStateType;
+import it.ids.hackathown.domain.enums.StatoHackathon;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RegistrationState implements HackathonState {
 
     @Override
-    public HackathonStateType type() {
-        return HackathonStateType.ISCRIZIONI;
+    public StatoHackathon type() {
+        return StatoHackathon.ISCRIZIONI;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class RegistrationState implements HackathonState {
 
     @Override
     public void startHackathon(Hackathon hackathon) {
-        hackathon.setStato(HackathonStateType.IN_CORSO);
+        hackathon.setStato(StatoHackathon.IN_CORSO);
     }
 }

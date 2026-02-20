@@ -7,11 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SottomissioneRepository extends JpaRepository<Sottomissione, Long> {
 
-    boolean existsByHackathon_IdAndTeam_Id(Long hackathonId, Long teamId);
+    boolean existsByIscrizione_Hackathon_IdAndIscrizione_Team_Id(Long hackathonId, Long teamId);
 
-    Optional<Sottomissione> findByHackathon_IdAndTeam_Id(Long hackathonId, Long teamId);
+    Optional<Sottomissione> findByIscrizione_Hackathon_IdAndIscrizione_Team_Id(Long hackathonId, Long teamId);
 
-    List<Sottomissione> findByHackathon_Id(Long hackathonId);
+    List<Sottomissione> findByIscrizione_Hackathon_Id(Long hackathonId);
 
-    void deleteByHackathon_Id(Long hackathonId);
+    void deleteByIscrizione_Hackathon_Id(Long hackathonId);
 }

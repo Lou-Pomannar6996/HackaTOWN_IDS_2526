@@ -1,6 +1,6 @@
 package it.ids.hackathown.domain.entity;
 
-import it.ids.hackathown.domain.enums.SupportRequestStatus;
+import it.ids.hackathown.domain.enums.StatoRichiesta;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,7 +31,7 @@ public class RichiestaSupporto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "hackathon_id")
@@ -49,7 +49,7 @@ public class RichiestaSupporto {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SupportRequestStatus stato;
+    private StatoRichiesta stato;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "call_id")
@@ -61,28 +61,28 @@ public class RichiestaSupporto {
             dataRichiesta = LocalDateTime.now();
         }
         if (stato == null) {
-            stato = SupportRequestStatus.OPEN;
+            stato = StatoRichiesta.APERTA;
         }
     }
 
     public boolean isPending() {
-        return stato == SupportRequestStatus.OPEN;
+        return stato == StatoRichiesta.APERTA;
     }
 
     public boolean isGestita() {
-        return stato == SupportRequestStatus.IN_PROGRESS;
+        return stato == StatoRichiesta.IN_GESTIONE;
     }
 
     public void chiudi() {
-        stato = SupportRequestStatus.CLOSED;
+        stato = StatoRichiesta.CHIUSA;
     }
 
     public void pianificaCall(CallSupporto callSupporto) {
         this.call = callSupporto;
-        stato = SupportRequestStatus.IN_PROGRESS;
+        stato = StatoRichiesta.IN_GESTIONE;
     }
 
     public boolean isChiusa() {
-        return stato == SupportRequestStatus.CLOSED;
+        return stato == StatoRichiesta.CHIUSA;
     }
 }

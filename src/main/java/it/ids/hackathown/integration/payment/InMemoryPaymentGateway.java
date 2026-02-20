@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InMemoryPaymentGateway implements PaymentGateway {
+public class InMemoryPaymentGateway implements PaymentGateway, SistemaPagamento {
 
     private final Map<String, PaymentRecord> payments = new ConcurrentHashMap<>();
 
@@ -24,5 +24,11 @@ public class InMemoryPaymentGateway implements PaymentGateway {
     @Override
     public Optional<PaymentRecord> findByTransactionId(String transactionId) {
         return Optional.ofNullable(payments.get(transactionId));
+    }
+
+    @Override
+    public String executePayment(Integer teamId, BigDecimal importo, String riferimento) {
+        Long resolvedTeamId = teamId == null ? null : teamId.longValue();
+        return issuePrizePayment(null, resolvedTeamId, importo);
     }
 }

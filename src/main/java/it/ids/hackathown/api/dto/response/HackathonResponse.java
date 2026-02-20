@@ -1,25 +1,20 @@
 package it.ids.hackathown.api.dto.response;
 
-import it.ids.hackathown.domain.enums.HackathonStateType;
-import it.ids.hackathown.domain.enums.ScoringPolicyType;
-import it.ids.hackathown.domain.enums.ValidationPolicyType;
+import it.ids.hackathown.domain.enums.StatoHackathon;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public record HackathonResponse(
     Long id,
     String name,
+    String description,
     String rules,
-    LocalDateTime registrationDeadline,
-    LocalDateTime startDate,
-    LocalDateTime endDate,
+    Date registrationDeadline,
+    Date startDate,
+    Date endDate,
     String location,
     BigDecimal prizeMoney,
     Integer maxTeamSize,
-    HackathonStateType state,
-    ScoringPolicyType scoringPolicyType,
-    ValidationPolicyType validationPolicyType,
-    Long organizerUserId,
-    Long judgeUserId
+    StatoHackathon state
 ) {
 }

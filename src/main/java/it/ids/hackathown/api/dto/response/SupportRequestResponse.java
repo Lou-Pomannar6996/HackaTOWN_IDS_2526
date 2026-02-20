@@ -1,6 +1,6 @@
 package it.ids.hackathown.api.dto.response;
 
-import it.ids.hackathown.domain.enums.SupportRequestStatus;
+import it.ids.hackathown.domain.enums.StatoRichiesta;
 import java.time.LocalDateTime;
 
 public record SupportRequestResponse(
@@ -9,6 +9,6 @@ public record SupportRequestResponse(
     Long teamId,
     String message,
     LocalDateTime createdAt,
-    SupportRequestStatus status
+    StatoRichiesta status
 ) {
 }

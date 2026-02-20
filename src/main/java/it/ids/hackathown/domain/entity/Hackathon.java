@@ -1,25 +1,18 @@
 package it.ids.hackathown.domain.entity;
 
-import it.ids.hackathown.domain.enums.HackathonStateType;
-import it.ids.hackathown.domain.enums.ScoringPolicyType;
-import it.ids.hackathown.domain.enums.ValidationPolicyType;
+import it.ids.hackathown.domain.enums.StatoHackathon;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,7 +30,11 @@ public class Hackathon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
 
     @Column(nullable = false)
     private String nome;
@@ -49,13 +46,16 @@ public class Hackathon {
     private String regolamento;
 
     @Column(nullable = false)
-    private LocalDateTime scadenzaIscrizioni;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataInizio;
 
     @Column(nullable = false)
-    private LocalDateTime dataInizio;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataFine;
 
     @Column(nullable = false)
-    private LocalDateTime dataFine;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date scadenzaIscrizioni;
 
     private String luogo;
 
@@ -67,56 +67,44 @@ public class Hackathon {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private HackathonStateType stato;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ScoringPolicyType scoringPolicyType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ValidationPolicyType validationPolicyType;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "organizer_user_id")
-    private Utente organizer;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "judge_user_id")
-    private Utente judge;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "hackathon_mentors",
-        joinColumns = @JoinColumn(name = "hackathon_id"),
-        inverseJoinColumns = @JoinColumn(name = "mentor_user_id")
-    )
-    @Builder.Default
-    private Set<Utente> mentors = new HashSet<>();
+    private StatoHackathon stato;
 
     public boolean isInIscrizione() {
-        return stato == HackathonStateType.ISCRIZIONI;
+        return stato == StatoHackathon.ISCRIZIONI;
     }
 
-    public boolean inInCorso() {
-        return stato == HackathonStateType.IN_CORSO;
+    public boolean isInCorso() {
+        return stato == StatoHackathon.IN_CORSO;
     }
 
     public boolean isInValutazione() {
-        return stato == HackathonStateType.IN_VALUTAZIONE;
+        return stato == StatoHackathon.IN_VALUTAZIONE;
     }
 
     public boolean isConcluso() {
-        return stato == HackathonStateType.CONCLUSO;
+        return stato == StatoHackathon.CONCLUSO;
     }
 
     public boolean iscrizioniAperte() {
-        return scadenzaIscrizioni != null && LocalDateTime.now().isBefore(scadenzaIscrizioni);
+        return scadenzaIscrizioni != null && new Date().before(scadenzaIscrizioni);
     }
 
     public boolean sottomissioniAperte() {
+        Date now = new Date();
         return dataInizio != null && dataFine != null
-            && LocalDateTime.now().isAfter(dataInizio)
-            && LocalDateTime.now().isBefore(dataFine);
+                && now.after(dataInizio)
+                && now.before(dataFine);
+    }
+
+    public void setStato(StatoHackathon statoHackathon) {
+        this.stato = statoHackathon;
+    }
+
+    public StatoHackathon getStato() {
+        return stato;
+    }
+
+    public BigDecimal getPremio() {
+        return premio;
     }
 }

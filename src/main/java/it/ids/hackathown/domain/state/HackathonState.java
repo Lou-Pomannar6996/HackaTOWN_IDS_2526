@@ -1,12 +1,12 @@
 package it.ids.hackathown.domain.state;
 
 import it.ids.hackathown.domain.entity.Hackathon;
-import it.ids.hackathown.domain.enums.HackathonStateType;
+import it.ids.hackathown.domain.enums.StatoHackathon;
 import it.ids.hackathown.domain.exception.ForbiddenActionForState;
 
 public interface HackathonState {
 
-    HackathonStateType type();
+    StatoHackathon type();
 
     default void registerTeam(Hackathon hackathon) {
         deny("registerTeam");

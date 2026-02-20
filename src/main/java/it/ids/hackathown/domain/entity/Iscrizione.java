@@ -48,6 +48,10 @@ public class Iscrizione {
     @Column(nullable = false)
     private String stato;
 
+    public Hackathon getHackathon() {
+        return hackathon;
+    } 
+
     @PrePersist
     void prePersist() {
         if (dataIscrizione == null) {

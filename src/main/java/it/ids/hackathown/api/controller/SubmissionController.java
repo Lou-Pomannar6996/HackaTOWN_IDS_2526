@@ -34,9 +34,9 @@ public class SubmissionController {
         SubmissionResponse response = mapper.toResponse(submissionService.submitSubmission(
             hackathonId,
             currentUserId,
-            request.repoUrl(),
-            request.fileRef(),
-            request.description()
+            request.title(),
+            request.description(),
+            request.repoUrl()
         ));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -50,9 +50,9 @@ public class SubmissionController {
         return mapper.toResponse(submissionService.updateSubmission(
             submissionId,
             currentUserId,
-            request.repoUrl(),
-            request.fileRef(),
-            request.description()
+            request.title(),
+            request.description(),
+            request.repoUrl()
         ));
     }
 

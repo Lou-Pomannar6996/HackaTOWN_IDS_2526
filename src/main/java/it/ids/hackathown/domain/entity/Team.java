@@ -31,7 +31,7 @@ public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, unique = true)
     private String nome;
@@ -44,9 +44,9 @@ public class Team {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "team_members",
-        joinColumns = @JoinColumn(name = "team_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
+            name = "team_members",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     @Builder.Default
     private Set<Utente> membri = new HashSet<>();
@@ -64,5 +64,9 @@ public class Team {
 
     public void removeMembro(Utente utente) {
         membri.remove(utente);
+    }
+
+    public Integer getId() {
+        return id;
     }
 }

@@ -1,52 +1,63 @@
 package it.ids.hackathown.service;
 
 import it.ids.hackathown.domain.entity.Hackathon;
-import it.ids.hackathown.domain.entity.Team;
+import it.ids.hackathown.domain.entity.SegnalaViolazione;
 import it.ids.hackathown.domain.entity.Utente;
-import it.ids.hackathown.domain.entity.SegnalazioneViolazione;
+import it.ids.hackathown.domain.enums.StatoSegnalazione;
 import it.ids.hackathown.domain.exception.DomainValidationException;
-import it.ids.hackathown.repository.IscrizioneRepository;
-import it.ids.hackathown.repository.SegnalazioneValidazioneRepository;
+import it.ids.hackathown.domain.exception.ForbiddenActionForState;
+import it.ids.hackathown.domain.exception.NotFoundException;
+import it.ids.hackathown.repository.AssegnazioneStaffRepository;
+import it.ids.hackathown.repository.HackathonRepository;
+import it.ids.hackathown.repository.SegnalazioneViolazioneRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional(readOnly = true)
 public class ViolationService {
 
-    private final SegnalazioneValidazioneRepository segnalazioneValidazioneRepository;
-    private final IscrizioneRepository iscrizioneRepository;
-    private final AccessControlService accessControlService;
+    private final AssegnazioneStaffRepository assegnazioneStaffRepository;
+    private final HackathonRepository hackathonRepository;
+    private final SegnalazioneViolazioneRepository segnalazioneViolazioneRepository;
+    private final NotificationService notificationService;
 
     @Transactional
-    public SegnalazioneViolazione reportViolation(Long hackathonId, Long teamId, Long currentUserId, String reason) {
-        Hackathon hackathon = accessControlService.requireHackathon(hackathonId);
-        Team team = accessControlService.requireTeam(teamId);
-        Utente mentor = accessControlService.requireUser(currentUserId);
-
-        accessControlService.assertMentorAssigned(hackathon, currentUserId);
-
-        if (!iscrizioneRepository.existsByHackathon_IdAndTeam_Id(hackathonId, teamId)) {
-            throw new DomainValidationException("Cannot report violation for a team not registered in the hackathon");
+    public void segnalaViolazione(Integer mentoreId, Integer hackathonId, String motivazione) {
+        if (mentoreId == null || hackathonId == null) {
+            throw new DomainValidationException("Dati non validi");
+        }
+        boolean autorizzato = assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
+            hackathonId.longValue(),
+            mentoreId.longValue(),
+            "MENTORE"
+        );
+        if (!autorizzato) {
+            throw new ForbiddenActionForState("Operazione non autorizzata");
         }
 
-        SegnalazioneViolazione report = SegnalazioneViolazione.builder()
+        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+            .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
+
+        if (motivazione == null || motivazione.isBlank()) {
+            throw new DomainValidationException("Motivazione non valida");
+        }
+
+        Utente mentore = new Utente();
+        mentore.setId(mentoreId);
+
+        SegnalaViolazione segnalazione = SegnalaViolazione.builder()
             .hackathon(hackathon)
-            .team(team)
-            .mentor(mentor)
-            .motivaizone(reason)
+            .mentore(mentore)
+            .motivazione(motivazione.trim())
+            .dataSegnalazione(LocalDateTime.now())
+            .stato(StatoSegnalazione.INVIATA)
             .build();
 
-        SegnalazioneViolazione saved = segnalazioneValidazioneRepository.save(report);
-        log.info("Violation report {} created for team {} in hackathon {}", saved.getId(), teamId, hackathonId);
-        return saved;
-    }
-
-    @Transactional
-    public SegnalazioneViolazione segnalaViolazione(Long hackathonId, Long teamId, Long currentUserId, String motivazione) {
-        return reportViolation(hackathonId, teamId, currentUserId, motivazione);
+        SegnalaViolazione salvata = segnalazioneViolazioneRepository.save(segnalazione);
+        notificationService.notificaOrganizzatore(hackathonId, salvata.getId());
     }
 }

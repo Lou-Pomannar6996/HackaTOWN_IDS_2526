@@ -1,6 +1,6 @@
 package it.ids.hackathown.domain.entity;
 
-import it.ids.hackathown.domain.enums.InviteStatus;
+import it.ids.hackathown.domain.enums.StatoInvito;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,7 +31,7 @@ public class Invito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "team_id")
@@ -50,7 +50,7 @@ public class Invito {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private InviteStatus stato;
+    private StatoInvito stato;
 
     @Column(nullable = false)
     private LocalDateTime dataInvio;
@@ -61,27 +61,27 @@ public class Invito {
             dataInvio = LocalDateTime.now();
         }
         if (stato == null) {
-            stato = InviteStatus.PENDING;
+            stato = StatoInvito.PENDING;
         }
     }
 
     public void accetta() {
-        stato = InviteStatus.ACCEPTED;
+        stato = StatoInvito.ACCEPTED;
     }
 
     public void rifiuta() {
-        stato = InviteStatus.REJECTED;
+        stato = StatoInvito.REJECTED;
     }
 
     public boolean isPending() {
-        return stato == InviteStatus.PENDING;
+        return stato == StatoInvito.PENDING;
     }
 
     public boolean isAccepted() {
-        return stato == InviteStatus.ACCEPTED;
+        return stato == StatoInvito.ACCEPTED;
     }
 
     public boolean isRejected() {
-        return stato == InviteStatus.REJECTED;
+        return stato == StatoInvito.REJECTED;
     }
 }

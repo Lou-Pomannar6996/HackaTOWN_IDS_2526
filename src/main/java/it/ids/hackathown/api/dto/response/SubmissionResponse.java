@@ -1,16 +1,14 @@
 package it.ids.hackathown.api.dto.response;
 
-import it.ids.hackathown.domain.enums.SubmissionStatus;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public record SubmissionResponse(
     Long id,
-    Long hackathonId,
-    Long teamId,
-    String repoUrl,
-    String fileRef,
+    Long registrationId,
+    String title,
     String description,
-    LocalDateTime updatedAt,
-    SubmissionStatus status
+    String repoUrl,
+    Date updatedAt,
+    Date submittedAt
 ) {
 }

@@ -4,6 +4,6 @@ public enum UserRole {
     ADMIN,
     REGISTERED_USER,
     ORGANIZER,
-    MENTOR,
-    JUDGE
+    JUDGE,
+    MENTOR
 }

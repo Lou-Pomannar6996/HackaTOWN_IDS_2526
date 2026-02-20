@@ -20,7 +20,7 @@ import it.ids.hackathown.domain.entity.RichiestaSupporto;
 import it.ids.hackathown.domain.entity.Team;
 import it.ids.hackathown.domain.entity.Invito;
 import it.ids.hackathown.domain.entity.Utente;
-import it.ids.hackathown.domain.entity.SegnalazioneViolazione;
+import it.ids.hackathown.domain.entity.SegnalaViolazione;
 import it.ids.hackathown.domain.entity.EsitoHackathon;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +29,9 @@ public class ApiMapper {
 
     public HackathonResponse toResponse(Hackathon hackathon) {
         return new HackathonResponse(
-            hackathon.getId(),
+            hackathon.getId() == null ? null : hackathon.getId().longValue(),
             hackathon.getNome(),
+            hackathon.getDescrizione(),
             hackathon.getRegolamento(),
             hackathon.getScadenzaIscrizioni(),
             hackathon.getDataInizio(),
@@ -38,22 +39,22 @@ public class ApiMapper {
             hackathon.getLuogo(),
             hackathon.getPremio(),
             hackathon.getMaxTeamSize(),
-            hackathon.getStato(),
-            hackathon.getScoringPolicyType(),
-            hackathon.getValidationPolicyType(),
-            hackathon.getOrganizer().getId(),
-            hackathon.getJudge().getId()
+            hackathon.getStato()
         );
     }
 
     public TeamResponse toResponse(Team team) {
-        return new TeamResponse(team.getId(), team.getNome(), team.getMaxMembri());
+        return new TeamResponse(
+            team.getId() == null ? null : team.getId().longValue(),
+            team.getNome(),
+            team.getMaxMembri()
+        );
     }
 
     public UserResponse toResponse(Utente user) {
         String nomeCompleto = user.getNome() + " " + user.getCognome();
         return new UserResponse(
-            user.getId(),
+            user.getId() == null ? null : user.getId().longValue(),
             user.getEmail(),
             nomeCompleto.trim(),
             user.getRoles()
@@ -63,8 +64,8 @@ public class ApiMapper {
     public InviteResponse toResponse(Invito invite) {
         String email = invite.getDestinatario() == null ? null : invite.getDestinatario().getEmail();
         return new InviteResponse(
-            invite.getId(),
-            invite.getTeam().getId(),
+            invite.getId() == null ? null : invite.getId().longValue(),
+            invite.getTeam() == null ? null : invite.getTeam().getId().longValue(),
             email,
             invite.getStato(),
             invite.getDataInvio()
@@ -74,30 +75,29 @@ public class ApiMapper {
     public RegistrationResponse toResponse(Iscrizione registration) {
         return new RegistrationResponse(
             registration.getId(),
-            registration.getHackathon().getId(),
-            registration.getTeam().getId(),
+            registration.getHackathon() == null ? null : registration.getHackathon().getId().longValue(),
+            registration.getTeam() == null ? null : registration.getTeam().getId().longValue(),
             registration.getDataIscrizione()
         );
     }
 
     public SubmissionResponse toResponse(Sottomissione submission) {
         return new SubmissionResponse(
-            submission.getId(),
-            submission.getHackathon().getId(),
-            submission.getTeam().getId(),
-            submission.getUrlRepo(),
-            submission.getFileRef(),
+            submission.getId() == null ? null : submission.getId().longValue(),
+            submission.getIscrizione() == null ? null : submission.getIscrizione().getId(),
+            submission.getTitolo(),
             submission.getDescrizione(),
+            submission.getUrlRepo(),
             submission.getDataUltimoAggiornamento(),
-            submission.getStatus()
+            submission.getDataInvio()
         );
     }
 
     public SupportRequestResponse toResponse(RichiestaSupporto supportRequest) {
         return new SupportRequestResponse(
-            supportRequest.getId(),
-            supportRequest.getHackathon().getId(),
-            supportRequest.getTeam().getId(),
+            supportRequest.getId() == null ? null : supportRequest.getId().longValue(),
+            supportRequest.getHackathon() == null ? null : supportRequest.getHackathon().getId().longValue(),
+            supportRequest.getTeam() == null ? null : supportRequest.getTeam().getId().longValue(),
             supportRequest.getDescrizione(),
             supportRequest.getDataRichiesta(),
             supportRequest.getStato()
@@ -105,47 +105,43 @@ public class ApiMapper {
     }
 
     public CallProposalResponse toResponse(CallSupporto proposal) {
-        String slot = proposal.getDataInizio() == null ? null
-            : proposal.getDataInizio() + " (" + proposal.getDurataMin() + " min)";
         return new CallProposalResponse(
-            proposal.getId(),
-            proposal.getHackathon().getId(),
-            proposal.getTeam().getId(),
-            proposal.getMentor().getId(),
-            slot,
+            proposal.getId() == null ? null : proposal.getId().longValue(),
+            proposal.getDataProposta(),
+            proposal.getDataInizio(),
+            proposal.getDurataMin(),
             proposal.getCalendarEventId(),
-            proposal.getStato(),
-            proposal.getDataProposta()
+            proposal.getStato()
         );
     }
 
     public EvaluationResponse toResponse(Valutazione evaluation) {
         return new EvaluationResponse(
             evaluation.getId(),
-            evaluation.getHackathon().getId(),
-            evaluation.getSubmission().getId(),
-            evaluation.getJudge().getId(),
+            evaluation.getHackathon() == null ? null : evaluation.getHackathon().getId().longValue(),
+            evaluation.getSubmission() == null ? null : evaluation.getSubmission().getId().longValue(),
+            evaluation.getJudge() == null ? null : evaluation.getJudge().getId().longValue(),
             evaluation.getPunteggio(),
             evaluation.getGiudizio(),
             evaluation.getDataValutazione()
         );
     }
 
-    public ViolationResponse toResponse(SegnalazioneViolazione violation) {
+    public ViolationResponse toResponse(SegnalaViolazione violation) {
         return new ViolationResponse(
-            violation.getId(),
-            violation.getHackathon().getId(),
-            violation.getTeam().getId(),
-            violation.getMentor().getId(),
-            violation.getMotivaizone(),
-            violation.getDataSegnalazione()
+            violation.getId() == null ? null : violation.getId().longValue(),
+            violation.getHackathon() == null ? null : violation.getHackathon().getId().longValue(),
+            violation.getMentore() == null ? null : violation.getMentore().getId().longValue(),
+            violation.getMotivazione(),
+            violation.getDataSegnalazione(),
+            violation.getStato()
         );
     }
 
     public WinnerResponse toResponse(EsitoHackathon winner) {
         return new WinnerResponse(
             winner.getId(),
-            winner.getTeam().getId(),
+            winner.getTeam() == null ? null : winner.getTeam().getId().longValue(),
             winner.getDataProclamazione(),
             winner.getNote()
         );

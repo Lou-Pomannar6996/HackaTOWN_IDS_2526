@@ -1,6 +1,9 @@
 package it.ids.hackathown.domain.entity;
 
 import it.ids.hackathown.domain.enums.UserRole;
+import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,9 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
 import java.util.HashSet;
 import java.util.Set;
 import java.time.LocalDateTime;
@@ -37,7 +37,7 @@ public class Utente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -61,6 +61,7 @@ public class Utente {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     @Builder.Default
     private Set<UserRole> roles = new HashSet<>();
 
@@ -81,5 +82,9 @@ public class Utente {
 
     public void abbandonaTeam() {
         this.teamCorrente = null;
+    }
+
+    public String getPassword() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

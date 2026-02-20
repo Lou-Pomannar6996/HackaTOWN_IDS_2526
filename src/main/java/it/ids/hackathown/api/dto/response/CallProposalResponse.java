@@ -1,16 +1,14 @@
 package it.ids.hackathown.api.dto.response;
 
-import it.ids.hackathown.domain.enums.CallProposalStatus;
-import java.time.LocalDateTime;
+import it.ids.hackathown.domain.enums.StatoCall;
+import java.util.Date;
 
 public record CallProposalResponse(
     Long id,
-    Long hackathonId,
-    Long teamId,
-    Long mentorId,
-    String proposedSlots,
-    String calendarBookingId,
-    CallProposalStatus status,
-    LocalDateTime createdAt
+    Date dataProposta,
+    Date dataInizio,
+    Integer durataMin,
+    String calendarEventId,
+    StatoCall stato
 ) {
 }

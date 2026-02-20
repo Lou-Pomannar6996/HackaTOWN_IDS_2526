@@ -1,21 +1,16 @@
 package it.ids.hackathown.domain.entity;
 
-import it.ids.hackathown.domain.enums.SubmissionStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import java.time.LocalDateTime;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,10 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(
-    name = "submissions",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"hackathon_id", "team_id"})
-)
+@Table(name = "submissions")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,17 +28,9 @@ public class Sottomissione {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "hackathon_id")
-    private Hackathon hackathon;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "team_id")
-    private Team team;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "registration_id")
     private Iscrizione iscrizione;
 
@@ -56,58 +40,48 @@ public class Sottomissione {
     @Column(length = 1024)
     private String urlRepo;
 
-    @Column(length = 1024)
-    private String fileRef;
-
     @Column(length = 4000)
     private String descrizione;
 
     @Column(nullable = false)
-    private LocalDateTime dataUltimoAggiornamento;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataUltimoAggiornamento;
 
-    private LocalDateTime dataInvio;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataInvio;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SubmissionStatus status;
+    public String getTitolo() {
+        return titolo;
+    }
+    public String getDescrizione() {
+        return descrizione;
+    }
+    public String getUrlRepo() {
+        return urlRepo;
+    }
 
-    @PrePersist
-    void prePersist() {
-        if (dataUltimoAggiornamento == null) {
-            dataUltimoAggiornamento = LocalDateTime.now();
+    public void updateSubmission(Sottomissione payload) {
+        if (payload == null) {
+            return;
         }
-        if (dataInvio == null) {
-            dataInvio = LocalDateTime.now();
-        }
-        if (status == null) {
-            status = SubmissionStatus.SUBMITTED;
-        }
+        this.titolo = payload.getTitolo();
+        this.descrizione = payload.getDescrizione();
+        this.urlRepo = payload.getUrlRepo();
+        setDataUltimoAggiornamento(new Date());
     }
 
-    @PreUpdate
-    void preUpdate() {
-        dataUltimoAggiornamento = LocalDateTime.now();
+    public void setDataUltimoAggiornamento(Date now) {
+        this.dataUltimoAggiornamento = now;
     }
 
-    public void updateSubmission(String titolo, String descrizione, String urlRepo) {
-        this.titolo = titolo;
-        this.descrizione = descrizione;
-        this.urlRepo = urlRepo;
-        setDataUltimoAggiornamento(LocalDateTime.now());
+    public void setDataInvio(Date now) {
+        this.dataInvio = now;
     }
 
-    public void setDataUltimoAggiornamento(LocalDateTime dataUltimoAggiornamento) {
-        this.dataUltimoAggiornamento = dataUltimoAggiornamento;
-    }
-
-    public void setDataInvio(LocalDateTime dataInvio) {
-        this.dataInvio = dataInvio;
-    }
-
-    public Long getHackathonId() {
+    public Integer getHackathonId() {
         if (iscrizione != null && iscrizione.getHackathon() != null) {
             return iscrizione.getHackathon().getId();
         }
-        return hackathon != null ? hackathon.getId() : null;
+        return null;
     }
 }

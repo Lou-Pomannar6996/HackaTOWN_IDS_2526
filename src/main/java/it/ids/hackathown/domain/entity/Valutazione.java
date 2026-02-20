@@ -44,7 +44,7 @@ public class Valutazione {
     private Sottomissione submission;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "judge_id")
+    @JoinColumn(name = "judge_user_id")
     private Utente judge;
 
     @Column(nullable = false, precision = 4, scale = 2)
