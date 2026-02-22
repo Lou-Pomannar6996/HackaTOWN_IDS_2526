@@ -9,13 +9,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface ValutazioneRepository extends JpaRepository<Valutazione, Long> {
 
-    List<Valutazione> findByHackathon_Id(Long hackathonId);
+    List<Valutazione> findByHackathon_Id(Integer hackathonId);
 
-    Optional<Valutazione> findBySubmission_Id(Long submissionId);
+    Optional<Valutazione> findBySubmission_Id(Integer submissionId);
 
-    boolean existsBySubmission_Id(Long submissionId);
+    boolean existsBySubmission_Id(Integer submissionId);
 
-    long countByHackathon_Id(Long hackathonId);
+    long countByHackathon_Id(Integer hackathonId);
 
     @Query("""
         select count(s) from Sottomissione s
@@ -25,7 +25,14 @@ public interface ValutazioneRepository extends JpaRepository<Valutazione, Long> 
             where v.submission = s
         )
         """)
-    long countNonValutate(@Param("hackathonId") Long hackathonId);
+    long countNonValutate(@Param("hackathonId") Integer hackathonId);
 
-    void deleteByHackathon_Id(Long hackathonId);
+    void deleteByHackathon_Id(Integer hackathonId);
+
+    default Optional<Valutazione> findBySottomissioneId(Integer submissionId) {
+        if (submissionId == null) {
+            return Optional.empty();
+        }
+        return findBySubmission_Id(submissionId);
+    }
 }

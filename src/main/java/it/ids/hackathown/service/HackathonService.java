@@ -147,9 +147,9 @@ public class HackathonService {
     public void aggiungiMentore(Integer hackathonId, Integer mentoreId) {
         Hackathon hackathon = requireHackathon(hackathonId);
         Utente mentore = requireUser(mentoreId, "Mentore");
-        if (assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId.longValue(),
-            mentoreId.longValue(),
+        if (assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            mentoreId,
+            hackathonId,
             "MENTORE"
         )) {
             throw new ConflictException("Mentore gia assegnato");
@@ -168,7 +168,7 @@ public class HackathonService {
         Hackathon hackathon = requireHackathon(hackathonId);
 
         Iscrizione existing = iscrizioneRepository
-            .findByHackathon_IdAndTeam_Id(hackathonId.longValue(), teamId.longValue())
+            .findByTeamAndHackathon(teamId, hackathonId)
             .orElse(null);
         if (existing != null && existing.isAttiva()) {
             throw new ConflictException("Team gia iscritto");
@@ -191,7 +191,7 @@ public class HackathonService {
         if (hackathonId == null) {
             return false;
         }
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue()).orElse(null);
+        Hackathon hackathon = hackathonRepository.findById(hackathonId).orElse(null);
         return hackathon != null && hackathon.getStato() == StatoHackathon.ISCRIZIONI;
     }
 
@@ -199,11 +199,11 @@ public class HackathonService {
         if (teamId == null || hackathonId == null) {
             return false;
         }
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue()).orElse(null);
+        Hackathon hackathon = hackathonRepository.findById(hackathonId).orElse(null);
         if (hackathon == null || hackathon.getMaxTeamSize() == null) {
             return false;
         }
-        long membri = utenteRepository.countByTeamCorrente_Id(teamId.longValue());
+        long membri = utenteRepository.countByTeamCorrente_Id(teamId);
         if (membri <= 0) {
             return false;
         }
@@ -217,7 +217,7 @@ public class HackathonService {
             throw new DomainValidationException("Hackathon non concluso");
         }
 
-        EsitoHackathon esito = esitoRepository.findByHackathon_Id(hackathonId.longValue())
+        EsitoHackathon esito = esitoRepository.findByHackathonId(hackathonId)
             .orElseThrow(() -> new DomainValidationException("Esito non disponibile"));
 
         Team vincitore = esito.getTeam();
@@ -243,7 +243,7 @@ public class HackathonService {
         if (hackathonId == null) {
             return null;
         }
-        return hackathonRepository.findById(hackathonId.longValue()).orElse(null);
+        return hackathonRepository.findById(hackathonId).orElse(null);
     }
 
     public AggiornaStatoFormDTO getFormAggiornaStato(Integer hackathonId, Integer organizzatoreId) {
@@ -285,7 +285,7 @@ public class HackathonService {
             }
         }
         if (corrente == StatoHackathon.IN_VALUTAZIONE && prossimo == StatoHackathon.CONCLUSO) {
-            if (esitoRepository.findByHackathon_Id(hackathonId.longValue()).isEmpty()) {
+            if (esitoRepository.findByHackathonId(hackathonId).isEmpty()) {
                 throw new DomainValidationException("Vincitore non proclamato");
             }
         }
@@ -319,7 +319,7 @@ public class HackathonService {
         if (hackathon.getStato() != StatoHackathon.IN_VALUTAZIONE) {
             throw new DomainValidationException("Hackathon non in valutazione");
         }
-        List<Sottomissione> submissions = sottomissioneRepository.findByIscrizione_Hackathon_Id(hackathonId.longValue());
+        List<Sottomissione> submissions = sottomissioneRepository.findByIscrizione_Hackathon_Id(hackathonId);
         return listaTeamCandidati(submissions);
     }
 
@@ -332,11 +332,11 @@ public class HackathonService {
         if (hackathon.getStato() != StatoHackathon.IN_VALUTAZIONE) {
             throw new DomainValidationException("Hackathon non in valutazione");
         }
-        long nonValutate = valutazioneRepository.countNonValutate(hackathonId.longValue());
+        long nonValutate = valutazioneRepository.countNonValutate(hackathonId);
         if (nonValutate > 0) {
             throw new DomainValidationException("Valutazioni non completate");
         }
-        if (esitoRepository.findByHackathon_Id(hackathonId.longValue()).isPresent()) {
+        if (esitoRepository.findByHackathonId(hackathonId).isPresent()) {
             throw new ConflictException("Vincitore gia proclamato");
         }
 
@@ -371,7 +371,7 @@ public class HackathonService {
     @Transactional
     public EsitoHackathon creaEsitoHackathon(Integer hackathonId, Integer teamId, Date now) {
         Hackathon hackathon = requireHackathon(hackathonId);
-        long membri = utenteRepository.countByTeamCorrente_Id(teamId.longValue());
+        long membri = utenteRepository.countByTeamCorrente_Id(teamId);
         if (membri <= 0) {
             throw new DomainValidationException("Team non valido");
         }
@@ -392,7 +392,7 @@ public class HackathonService {
         if (userId == null) {
             throw new DomainValidationException(role + " obbligatorio");
         }
-        return utenteRepository.findById(userId.longValue())
+        return utenteRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("Utente non trovato: " + userId));
     }
 
@@ -400,7 +400,7 @@ public class HackathonService {
         if (hackathonId == null) {
             throw new DomainValidationException("Hackathon non valido");
         }
-        return hackathonRepository.findById(hackathonId.longValue())
+        return hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato: " + hackathonId));
     }
 
@@ -408,9 +408,9 @@ public class HackathonService {
         if (hackathonId == null || organizzatoreId == null) {
             return false;
         }
-        return assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId.longValue(),
-            organizzatoreId.longValue(),
+        return assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            organizzatoreId,
+            hackathonId,
             "ORGANIZZATORE"
         );
     }

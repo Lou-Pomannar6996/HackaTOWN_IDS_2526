@@ -28,11 +28,11 @@ public class InvitoService {
 
     @Transactional
     public Invito invitaUtenteATeam(Integer mittenteId, Integer destinatarioId, Integer teamId) {
-        Utente mittente = utenteRepository.findById(mittenteId.longValue())
+        Utente mittente = utenteRepository.findById(mittenteId)
             .orElseThrow(() -> new NotFoundException("Mittente non trovato"));
-        Utente destinatario = utenteRepository.findById(destinatarioId.longValue())
+        Utente destinatario = utenteRepository.findById(destinatarioId)
             .orElseThrow(() -> new NotFoundException("Destinatario non trovato"));
-        Team team = teamRepository.findById(teamId.longValue())
+        Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new NotFoundException("Team non trovato"));
 
         boolean isMember = team.getMembri().stream()
@@ -45,9 +45,9 @@ public class InvitoService {
             throw new ConflictException("Utente gia in un team");
         }
 
-        if (invitoRepository.existsByTeam_IdAndDestinatario_IdAndStato(
-            teamId.longValue(),
-            destinatarioId.longValue(),
+        if (invitoRepository.existsByDestinatario_IdAndTeam_IdAndStato(
+            destinatarioId,
+            teamId,
             StatoInvito.PENDING
         )) {
             throw new ConflictException("Invito gia presente");
@@ -65,7 +65,7 @@ public class InvitoService {
 
     @Transactional
     public void accettaInvito(Integer invitoId, Integer utenteId) {
-        Invito invito = invitoRepository.findById(invitoId.longValue())
+        Invito invito = invitoRepository.findById(invitoId)
             .orElseThrow(() -> new NotFoundException("Invito non trovato"));
         Utente destinatario = invito.getDestinatario();
         if (destinatario == null || !destinatario.getId().equals(utenteId)) {
@@ -75,7 +75,7 @@ public class InvitoService {
             throw new DomainValidationException("Invito non valido");
         }
 
-        Utente utente = utenteRepository.findById(utenteId.longValue())
+        Utente utente = utenteRepository.findById(utenteId)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
         if (utente.getTeamCorrente() != null) {
             throw new ConflictException("Sei gia in un team");
@@ -98,7 +98,7 @@ public class InvitoService {
         invitoRepository.save(invito);
 
         List<Invito> pendenti = invitoRepository.findByDestinatario_IdAndStato(
-            utenteId.longValue(),
+            utenteId,
             StatoInvito.PENDING
         );
         for (Invito pending : pendenti) {
@@ -112,7 +112,7 @@ public class InvitoService {
 
     @Transactional
     public void rifiutaInvito(Integer invitoId, Integer utenteId) {
-        Invito invito = invitoRepository.findById(invitoId.longValue())
+        Invito invito = invitoRepository.findById(invitoId)
             .orElseThrow(() -> new NotFoundException("Invito non trovato"));
         Utente destinatario = invito.getDestinatario();
         if (destinatario == null || !destinatario.getId().equals(utenteId)) {
@@ -127,12 +127,12 @@ public class InvitoService {
 
     public List<Invito> invitiPendentiPerUtente(Integer utenteId) {
         return invitoRepository.findByDestinatario_IdAndStato(
-            utenteId.longValue(),
+            utenteId,
             StatoInvito.PENDING
         );
     }
 
     public List<Invito> getInviti(Integer utenteId) {
-        return invitoRepository.findByDestinatario_Id(utenteId.longValue());
+        return invitoRepository.findByDestinatario_Id(utenteId);
     }
 }

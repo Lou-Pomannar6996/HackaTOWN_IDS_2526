@@ -59,23 +59,23 @@ public class PaymentService {
 
     @Transactional
     public void erogaPremio(Integer organizzattoreId, Integer hackathonId) {
-        boolean autorizzato = assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId == null ? null : hackathonId.longValue(),
-            organizzattoreId == null ? null : organizzattoreId.longValue(),
+        boolean autorizzato = assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            organizzattoreId,
+            hackathonId,
             "ORGANIZZATORE"
         );
         if (!autorizzato) {
             throw new ForbiddenActionForState("Operazione non autorizzata");
         }
 
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
 
         if (!checkStatoErogazione(hackathon.getStato() == null ? null : hackathon.getStato().name())) {
             throw new DomainValidationException("Hackathon non concluso / non pronto");
         }
 
-        EsitoHackathon esito = esitoRepository.findByHackathon_Id(hackathonId.longValue())
+        EsitoHackathon esito = esitoRepository.findByHackathonId(hackathonId)
             .orElseThrow(() -> new DomainValidationException("Vincitore non proclamato"));
 
         Team teamVincitore = esito.getTeam();
@@ -83,11 +83,13 @@ public class PaymentService {
             throw new DomainValidationException("Vincitore non proclamato");
         }
 
-        Optional<PagamentoPremio> pagamentoEsistente = pagamentoRepository.findByHackathon_Id(
-            hackathonId.longValue()
-        );
-        if (pagamentoEsistente.isPresent() && pagamentoEsistente.get().isEseguito()) {
-            throw new ConflictException("Premio gia erogato");
+        if (pagamentoRepository.existsByHackathonId(hackathonId)) {
+            Optional<PagamentoPremio> pagamentoEsistente = pagamentoRepository.findByHackathonId(
+                hackathonId
+            );
+            if (pagamentoEsistente.isPresent() && pagamentoEsistente.get().isEseguito()) {
+                throw new ConflictException("Premio gia erogato");
+            }
         }
 
         String esitoPagamento = eseguiPagamento(teamVincitore, hackathon.getPremio());

@@ -85,6 +85,6 @@ public class Utente {
     }
 
     public String getPassword() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return password;
     }
 }

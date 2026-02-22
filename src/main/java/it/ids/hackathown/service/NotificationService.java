@@ -25,7 +25,7 @@ public class NotificationService {
         }
 
         List<AssegnazioneStaff> assegnazioni = assegnazioneStaffRepository
-            .findByHackathon_IdAndRuoloIgnoreCase(hackathonId.longValue(), "ORGANIZZATORE");
+            .findByHackathonAndRuolo(hackathonId, "ORGANIZZATORE");
         if (assegnazioni.isEmpty() || assegnazioni.get(0).getStaff() == null) {
             throw new NotFoundException("Organizzatore non trovato");
         }

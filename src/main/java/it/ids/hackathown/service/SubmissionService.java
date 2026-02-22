@@ -16,7 +16,6 @@ import it.ids.hackathown.repository.IscrizioneRepository;
 import it.ids.hackathown.repository.SottomissioneRepository;
 import it.ids.hackathown.repository.ValutazioneRepository;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,14 +35,14 @@ public class SubmissionService {
     private final ValutazioneRepository valutazioneRepository;
 
     public void getSubmissionForm(Integer utenteId, Integer hackathonId) {
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
         if (hackathon.getStato() != StatoHackathon.IN_CORSO) {
             throw new DomainValidationException("Caricamento non consentito in questo stato");
         }
         Iscrizione iscrizione = iscrizioneRepository.findByHackathon_IdAndTeam_Membri_Id(
-            hackathonId.longValue(),
-            utenteId.longValue()
+            hackathonId,
+            utenteId
         ).orElseThrow(() -> new DomainValidationException("Team non iscritto"));
         if (iscrizione.getTeam() == null) {
             throw new DomainValidationException("Team non iscritto");
@@ -52,26 +51,32 @@ public class SubmissionService {
 
     @Transactional
     public void caricaSottomissione(Integer utenteId, Integer hackathonId, Object payload) {
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
         if (hackathon.getStato() != StatoHackathon.IN_CORSO) {
             throw new DomainValidationException("Caricamento non consentito in questo stato");
         }
         Iscrizione iscrizione = iscrizioneRepository.findByHackathon_IdAndTeam_Membri_Id(
-            hackathonId.longValue(),
-            utenteId.longValue()
+            hackathonId,
+            utenteId
         ).orElseThrow(() -> new DomainValidationException("Team non iscritto"));
         Team team = iscrizione.getTeam();
         if (team == null || team.getId() == null) {
             throw new DomainValidationException("Team non iscritto");
         }
 
-        Sottomissione existing = sottomissioneRepository
-            .findByIscrizione_Hackathon_IdAndIscrizione_Team_Id(
-                hackathonId.longValue(),
-                team.getId().longValue()
-            )
-            .orElse(null);
+        Sottomissione existing = null;
+        if (iscrizione.getId() != null) {
+            existing = sottomissioneRepository.findByIscrizioneId(iscrizione.getId()).orElse(null);
+        }
+        if (existing == null) {
+            existing = sottomissioneRepository
+                .findByIscrizione_Hackathon_IdAndIscrizione_Team_Id(
+                    hackathonId,
+                    team.getId()
+                )
+                .orElse(null);
+        }
 
         Date now = new Date();
         Sottomissione data = buildPayload(payload);
@@ -94,36 +99,32 @@ public class SubmissionService {
     }
 
     public List<Sottomissione> getSottomissioni(Integer giudiceId) {
-        List<Long> hackathonIds = assegnazioneStaffRepository.findHackathonIdsByStaffAndRuolo(
-            giudiceId.longValue(),
+        List<Integer> hackathonIds = assegnazioneStaffRepository.findHackathonIdsByStaffIdAndRuolo(
+            giudiceId,
             "GIUDICE"
         );
         if (hackathonIds.isEmpty()) {
             return List.of();
         }
-        List<Sottomissione> result = new ArrayList<>();
-        for (Long hackathonId : hackathonIds) {
-            result.addAll(sottomissioneRepository.findByIscrizione_Hackathon_Id(hackathonId));
-        }
-        return result;
+        return sottomissioneRepository.findByHackathonIds(hackathonIds);
     }
 
     public Sottomissione getDettaglioSottomissione(Integer submissionId, Integer giudiceId) {
-        Sottomissione submission = sottomissioneRepository.findById(submissionId.longValue())
+        Sottomissione submission = sottomissioneRepository.findById(submissionId)
             .orElseThrow(() -> new NotFoundException("Sottomissione non trovata"));
         Integer hackathonId = submission.getHackathonId();
         if (hackathonId == null) {
             throw new NotFoundException("Hackathon non trovato");
         }
-        boolean autorizzato = assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId.longValue(),
-            giudiceId.longValue(),
+        boolean autorizzato = assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            giudiceId,
+            hackathonId,
             "GIUDICE"
         );
         if (!autorizzato) {
             throw new ForbiddenActionForState("Operazione non autorizzata");
         }
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
         if (hackathon.getStato() != StatoHackathon.IN_VALUTAZIONE) {
             throw new DomainValidationException("Hackathon non in valutazione");
@@ -136,27 +137,27 @@ public class SubmissionService {
         if (punteggio == null || punteggio < 0 || punteggio > 10) {
             throw new DomainValidationException("Punteggio non valido");
         }
-        Sottomissione submission = sottomissioneRepository.findById(submissionId.longValue())
+        Sottomissione submission = sottomissioneRepository.findById(submissionId)
             .orElseThrow(() -> new NotFoundException("Sottomissione non trovata"));
         Integer hackathonId = submission.getHackathonId();
         if (hackathonId == null) {
             throw new NotFoundException("Hackathon non trovato");
         }
-        boolean autorizzato = assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId.longValue(),
-            giudiceId.longValue(),
+        boolean autorizzato = assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            giudiceId,
+            hackathonId,
             "GIUDICE"
         );
         if (!autorizzato) {
             throw new ForbiddenActionForState("Operazione non autorizzata");
         }
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
         if (hackathon.getStato() != StatoHackathon.IN_VALUTAZIONE) {
             throw new DomainValidationException("Hackathon non in valutazione");
         }
 
-        Valutazione valutazione = valutazioneRepository.findBySubmission_Id(submissionId.longValue())
+        Valutazione valutazione = valutazioneRepository.findBySottomissioneId(submissionId)
             .orElse(null);
         Date now = new Date();
         if (valutazione == null) {

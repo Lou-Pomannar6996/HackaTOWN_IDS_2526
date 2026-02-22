@@ -32,7 +32,7 @@ public class AutenticazioneService {
     }
 
     public void logout(Integer utenteId) {
-        if (utenteId == null || !utenteRepository.existsById(utenteId.longValue())) {
+        if (utenteId == null || !utenteRepository.existsById(utenteId)) {
             throw new UnauthorizedException("Credenziali non valide");
         }
     }

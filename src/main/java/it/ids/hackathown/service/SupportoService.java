@@ -8,6 +8,7 @@ import it.ids.hackathown.domain.entity.Team;
 import it.ids.hackathown.domain.enums.StatoCall;
 import it.ids.hackathown.domain.enums.StatoHackathon;
 import it.ids.hackathown.domain.enums.StatoRichiesta;
+import it.ids.hackathown.domain.exception.ConflictException;
 import it.ids.hackathown.domain.exception.DomainValidationException;
 import it.ids.hackathown.domain.exception.ForbiddenActionForState;
 import it.ids.hackathown.domain.exception.NotFoundException;
@@ -39,7 +40,7 @@ public class SupportoService {
     private final HackathonRepository hackathonRepository;
 
     public List<RichiestaSupporto> listaRichieste(Integer hackathonId) {
-        return richiestaSupportoRepository.findByHackathon_Id(hackathonId.longValue());
+        return richiestaSupportoRepository.findByHackathon_Id(hackathonId);
     }
 
     @Transactional
@@ -49,9 +50,9 @@ public class SupportoService {
         if (hackathonId == null) {
             throw new NotFoundException("Hackathon non trovato");
         }
-        boolean autorizzato = assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId.longValue(),
-            mentoreId.longValue(),
+        boolean autorizzato = assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            mentoreId,
+            hackathonId,
             "MENTORE"
         );
         if (!autorizzato) {
@@ -78,14 +79,14 @@ public class SupportoService {
         if (descrizione == null || descrizione.isBlank()) {
             throw new DomainValidationException("Descrizione non valida");
         }
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
         if (hackathon.getStato() != StatoHackathon.IN_CORSO) {
             throw new DomainValidationException("Supporto non disponibile");
         }
         Iscrizione iscrizione = iscrizioneRepository.findByHackathon_IdAndTeam_Membri_Id(
-            hackathonId.longValue(),
-            utenteId.longValue()
+            hackathonId,
+            utenteId
         ).orElseThrow(() -> new DomainValidationException("Team non iscritto"));
         Team team = iscrizione.getTeam();
         if (team == null) {
@@ -104,18 +105,14 @@ public class SupportoService {
     }
 
     public List<RichiestaSupporto> getRichiesteSupporto(Integer mentoreId) {
-        List<Long> hackathonIds = assegnazioneStaffRepository.findHackathonIdsByStaffAndRuolo(
-            mentoreId.longValue(),
+        List<Integer> hackathonIds = assegnazioneStaffRepository.findHackathonIdsByStaffIdAndRuolo(
+            mentoreId,
             "MENTORE"
         );
         if (hackathonIds.isEmpty()) {
             return List.of();
         }
-        List<RichiestaSupporto> result = new ArrayList<>();
-        for (Long hackathonId : hackathonIds) {
-            result.addAll(richiestaSupportoRepository.findByHackathon_Id(hackathonId));
-        }
-        return result;
+        return richiestaSupportoRepository.findByHackathonIds(hackathonIds);
     }
 
     @Transactional
@@ -126,19 +123,22 @@ public class SupportoService {
         Integer durataMin,
         String calendarEventId
     ) {
-        RichiestaSupporto richiesta = richiestaSupportoRepository.findById(richiestaId.longValue())
+        RichiestaSupporto richiesta = richiestaSupportoRepository.findById(richiestaId)
             .orElseThrow(() -> new NotFoundException("Richiesta non trovata"));
         Integer hackathonId = richiesta.getHackathon() == null ? null : richiesta.getHackathon().getId();
         if (hackathonId == null) {
             throw new NotFoundException("Hackathon non trovato");
         }
-        boolean autorizzato = assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId.longValue(),
-            mentoreId.longValue(),
+        boolean autorizzato = assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            mentoreId,
+            hackathonId,
             "MENTORE"
         );
         if (!autorizzato) {
             throw new ForbiddenActionForState("Operazione non autorizzata");
+        }
+        if (callSupportoRepository.findByRichiestaId(richiestaId).isPresent()) {
+            throw new ConflictException("Call gia proposta");
         }
         if (dataProposta == null || !dataProposta.after(new Date())) {
             throw new DomainValidationException("Data proposta non valida");
@@ -164,7 +164,7 @@ public class SupportoService {
     }
 
     public RichiestaSupporto getDettaglioRichiesta(Integer richiestaId) {
-        return richiestaSupportoRepository.findById(richiestaId.longValue())
+        return richiestaSupportoRepository.findById(richiestaId)
             .orElseThrow(() -> new NotFoundException("Richiesta non trovata"));
     }
 }

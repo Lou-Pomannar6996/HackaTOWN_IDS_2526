@@ -30,16 +30,16 @@ public class ViolationService {
         if (mentoreId == null || hackathonId == null) {
             throw new DomainValidationException("Dati non validi");
         }
-        boolean autorizzato = assegnazioneStaffRepository.existsByHackathon_IdAndStaff_IdAndRuoloIgnoreCase(
-            hackathonId.longValue(),
-            mentoreId.longValue(),
+        boolean autorizzato = assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            mentoreId,
+            hackathonId,
             "MENTORE"
         );
         if (!autorizzato) {
             throw new ForbiddenActionForState("Operazione non autorizzata");
         }
 
-        Hackathon hackathon = hackathonRepository.findById(hackathonId.longValue())
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
 
         if (motivazione == null || motivazione.isBlank()) {

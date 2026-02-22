@@ -48,7 +48,7 @@ public class UtenteService {
         if (id == null) {
             throw new DomainValidationException("Id non valido");
         }
-        return utenteRepository.findById(id.longValue())
+        return utenteRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
     }
 
@@ -67,7 +67,7 @@ public class UtenteService {
             throw new DomainValidationException("Utente non valido");
         }
 
-        Utente existing = utenteRepository.findById(utente.getId().longValue())
+        Utente existing = utenteRepository.findById(utente.getId())
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
 
         String normalizedEmail = normalizeEmail(utente.getEmail());
@@ -90,7 +90,7 @@ public class UtenteService {
         if (id == null) {
             throw new DomainValidationException("Id non valido");
         }
-        Utente utente = utenteRepository.findById(id.longValue())
+        Utente utente = utenteRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
         if (utente.getTeamCorrente() != null) {
             throw new ConflictException("Devi prima abbandonare team");

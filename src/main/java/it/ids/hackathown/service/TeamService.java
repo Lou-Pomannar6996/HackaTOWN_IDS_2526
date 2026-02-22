@@ -26,7 +26,7 @@ public class TeamService {
         if (normalized.isEmpty()) {
             throw new DomainValidationException("Nome team non valido");
         }
-        Utente utente = utenteRepository.findById(utenteId.longValue())
+        Utente utente = utenteRepository.findById(utenteId)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
         if (utente.getTeamCorrente() != null) {
             throw new ConflictException("Sei gia in un team");
@@ -49,14 +49,14 @@ public class TeamService {
         if (utenteId == null) {
             return false;
         }
-        return utenteRepository.findById(utenteId.longValue())
+        return utenteRepository.findById(utenteId)
             .map(utente -> utente.getTeamCorrente() == null)
             .orElse(false);
     }
 
     @Transactional
     public void abbandonaTeam(Integer utenteId) {
-        Utente utente = utenteRepository.findById(utenteId.longValue())
+        Utente utente = utenteRepository.findById(utenteId)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
         Team team = utente.getTeamCorrente();
         if (team == null) {
