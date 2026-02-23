@@ -260,7 +260,7 @@ curl -X POST http://localhost:8082/api/hackathons/1/violations \
   -d '{"descrizione":"Team ha copiato codice","motivazione":"Violazione regolamento"}'
 ```
 
-## API per ciascun caso d'uso (cerchi blu)
+## API per ciascun caso d'uso
 1. Registrarsi alla piattaforma
 ```bash
 curl -X POST http://localhost:8082/api/users \
