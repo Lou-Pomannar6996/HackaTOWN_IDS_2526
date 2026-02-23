@@ -4,6 +4,7 @@ import it.ids.hackathown.api.dto.request.UpdateUserRolesRequest;
 import it.ids.hackathown.api.dto.response.UserResponse;
 import it.ids.hackathown.api.mapper.ApiMapper;
 import it.ids.hackathown.service.UtenteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,7 +25,7 @@ public class AdminController {
     public UserResponse updateUserRoles(
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @PathVariable Long userId,
-        @RequestBody UpdateUserRolesRequest request
+        @Valid @RequestBody UpdateUserRolesRequest request
     ) {
         return mapper.toResponse(utenteService.assignRoles(currentUserId, userId, request.roles()));
     }

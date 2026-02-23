@@ -1,11 +1,13 @@
 package it.ids.hackathown.api.error;
 
+import it.ids.hackathown.api.dto.response.ApiResponse;
+import it.ids.hackathown.api.dto.response.ErrorInfo;
 import it.ids.hackathown.domain.exception.DomainException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,51 +20,57 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
-    public ProblemDetail handleDomainException(DomainException ex, HttpServletRequest request) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
-        detail.setTitle(ex.getClass().getSimpleName());
-        detail.setProperty("path", request.getRequestURI());
-        return detail;
+    public ResponseEntity<ApiResponse<ErrorInfo>> handleDomainException(
+        DomainException ex,
+        HttpServletRequest request
+    ) {
+        return build(ex.getStatus(), ex.getClass().getSimpleName(), ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<ErrorInfo>> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException ex,
+        HttpServletRequest request
+    ) {
         List<String> errors = ex.getBindingResult().getFieldErrors().stream()
             .map(this::formatFieldError)
             .toList();
-
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Request validation failed");
-        detail.setTitle("ValidationError");
-        detail.setProperty("errors", errors);
-        detail.setProperty("path", request.getRequestURI());
-        return detail;
+        return build(HttpStatus.BAD_REQUEST, "ValidationError", "Request validation failed", request, errors);
     }
 
     @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
-    public ProblemDetail handleBadRequest(Exception ex, HttpServletRequest request) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        detail.setTitle("BadRequest");
-        detail.setProperty("path", request.getRequestURI());
-        return detail;
+    public ResponseEntity<ApiResponse<ErrorInfo>> handleBadRequest(Exception ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, "BadRequest", ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ProblemDetail handleMissingHeader(MissingRequestHeaderException ex, HttpServletRequest request) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        detail.setTitle("MissingHeader");
-        detail.setProperty("path", request.getRequestURI());
-        return detail;
+    public ResponseEntity<ApiResponse<ErrorInfo>> handleMissingHeader(
+        MissingRequestHeaderException ex,
+        HttpServletRequest request
+    ) {
+        return build(HttpStatus.BAD_REQUEST, "MissingHeader", ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleUnhandled(Exception ex, HttpServletRequest request) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+    public ResponseEntity<ApiResponse<ErrorInfo>> handleUnhandled(Exception ex, HttpServletRequest request) {
+        return build(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            "Unexpected server error"
+            "InternalServerError",
+            "Unexpected server error",
+            request,
+            null
         );
-        detail.setTitle("InternalServerError");
-        detail.setProperty("path", request.getRequestURI());
-        return detail;
+    }
+
+    private ResponseEntity<ApiResponse<ErrorInfo>> build(
+        HttpStatus status,
+        String error,
+        String detail,
+        HttpServletRequest request,
+        Object errors
+    ) {
+        ErrorInfo info = new ErrorInfo(status.value(), error, detail, request.getRequestURI(), errors);
+        return ResponseEntity.status(status).body(new ApiResponse<>("ERROR", info));
     }
 
     private String formatFieldError(FieldError fieldError) {

@@ -1,8 +1,10 @@
 package it.ids.hackathown.api.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record UpsertSubmissionRequest(
-    String title,
+    @NotBlank String title,
     String description,
-    String repoUrl
+    @NotBlank String repoUrl
 ) {
 }

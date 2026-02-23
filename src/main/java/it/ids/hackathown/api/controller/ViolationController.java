@@ -1,8 +1,7 @@
 package it.ids.hackathown.api.controller;
 
 import it.ids.hackathown.api.dto.request.ReportViolationRequest;
-import it.ids.hackathown.api.dto.response.ViolationResponse;
-import it.ids.hackathown.api.mapper.ApiMapper;
+import it.ids.hackathown.domain.exception.DomainValidationException;
 import it.ids.hackathown.service.ViolationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +20,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class ViolationController {
 
     private final ViolationService violationService;
-    private final ApiMapper mapper;
 
     @PostMapping("/{hackathonId}/violations")
-    public ResponseEntity<ViolationResponse> segnalaViolazione(
+    public ResponseEntity<String> segnalaViolazione(
         @PathVariable Long hackathonId,
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody ReportViolationRequest request
     ) {
-        ViolationResponse response = mapper.toResponse(
-            violationService.segnalaViolazione(hackathonId, request.teamId(), currentUserId, request.reason())
+        violationService.segnalaViolazione(
+            requirePositiveId(currentUserId, "Mentore"),
+            requirePositiveId(hackathonId, "Hackathon"),
+            request.descrizione(),
+            request.motivazione()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Segnalazione inviata con successo");
+    }
+
+    private Integer requirePositiveId(Long value, String label) {
+        if (value == null || value <= 0) {
+            throw new DomainValidationException(label + " non valido");
+        }
+        return value.intValue();
     }
 }

@@ -34,7 +34,7 @@ public class SubmissionService {
     private final HackathonRepository hackathonRepository;
     private final ValutazioneRepository valutazioneRepository;
 
-    public void getSubmissionForm(Integer utenteId, Integer hackathonId) {
+    public Sottomissione getSubmissionForm(Integer utenteId, Integer hackathonId) {
         Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
         if (hackathon.getStato() != StatoHackathon.IN_CORSO) {
@@ -44,9 +44,25 @@ public class SubmissionService {
             hackathonId,
             utenteId
         ).orElseThrow(() -> new DomainValidationException("Team non iscritto"));
-        if (iscrizione.getTeam() == null) {
+        Team team = iscrizione.getTeam();
+        if (team == null || team.getId() == null) {
             throw new DomainValidationException("Team non iscritto");
         }
+
+        Sottomissione existing = null;
+        if (iscrizione.getId() != null) {
+            existing = sottomissioneRepository.findByIscrizioneId(iscrizione.getId()).orElse(null);
+        }
+        if (existing == null) {
+            existing = sottomissioneRepository
+                .findByIscrizione_Hackathon_IdAndIscrizione_Team_Id(
+                    hackathonId,
+                    team.getId()
+                )
+                .orElse(null);
+        }
+
+        return existing == null ? new Sottomissione() : existing;
     }
 
     @Transactional
@@ -133,7 +149,7 @@ public class SubmissionService {
     }
 
     @Transactional
-    public void salvaValutazione(Integer giudiceId, Integer submissionId, Integer punteggio, String giudizio) {
+    public Valutazione salvaValutazione(Integer giudiceId, Integer submissionId, Integer punteggio, String giudizio) {
         if (punteggio == null || punteggio < 0 || punteggio > 10) {
             throw new DomainValidationException("Punteggio non valido");
         }
@@ -167,11 +183,26 @@ public class SubmissionService {
             Utente judge = new Utente();
             judge.setId(giudiceId);
             nuova.setJudge(judge);
-            valutazioneRepository.save(nuova);
+            return valutazioneRepository.save(nuova);
         } else {
             Valutazione aggiornata = aggiornaValutazione(valutazione, punteggio, giudizio, now);
-            valutazioneRepository.save(aggiornata);
+            return valutazioneRepository.save(aggiornata);
         }
+    }
+
+    public List<Valutazione> listValutazioni(Integer hackathonId, Integer giudiceId) {
+        if (hackathonId == null || giudiceId == null) {
+            throw new DomainValidationException("Dati non validi");
+        }
+        boolean autorizzato = assegnazioneStaffRepository.existsByStaffIdAndHackathonIdAndRuolo(
+            giudiceId,
+            hackathonId,
+            "GIUDICE"
+        );
+        if (!autorizzato) {
+            throw new ForbiddenActionForState("Operazione non autorizzata");
+        }
+        return valutazioneRepository.findByHackathon_Id(hackathonId);
     }
 
     @Transactional

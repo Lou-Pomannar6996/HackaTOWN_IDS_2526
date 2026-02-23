@@ -3,7 +3,8 @@ package it.ids.hackathown.api.controller;
 import it.ids.hackathown.api.dto.request.EvaluateSubmissionRequest;
 import it.ids.hackathown.api.dto.response.EvaluationResponse;
 import it.ids.hackathown.api.mapper.ApiMapper;
-import it.ids.hackathown.service.EvaluationService;
+import it.ids.hackathown.domain.exception.DomainValidationException;
+import it.ids.hackathown.service.SubmissionService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class EvaluationController {
 
-    private final EvaluationService evaluationService;
+    private final SubmissionService submissionService;
     private final ApiMapper mapper;
 
     @PostMapping("/submissions/{submissionId}/evaluations")
@@ -29,13 +30,11 @@ public class EvaluationController {
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody EvaluateSubmissionRequest request
     ) {
-        return mapper.toResponse(evaluationService.evaluateSubmission(
-            submissionId,
-            currentUserId,
-            request.judgeScore(),
-            request.innovationScore(),
-            request.technicalScore(),
-            request.comment()
+        return mapper.toResponse(submissionService.salvaValutazione(
+            requirePositiveId(currentUserId, "Giudice"),
+            requirePositiveId(submissionId, "Sottomissione"),
+            request.punteggio(),
+            request.giudizio()
         ));
     }
 
@@ -44,6 +43,19 @@ public class EvaluationController {
         @PathVariable Long hackathonId,
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
     ) {
-        return evaluationService.listEvaluations(hackathonId, currentUserId).stream().map(mapper::toResponse).toList();
+        return submissionService.listValutazioni(
+            requirePositiveId(hackathonId, "Hackathon"),
+            requirePositiveId(currentUserId, "Giudice")
+        )
+            .stream()
+            .map(mapper::toResponse)
+            .toList();
+    }
+
+    private Integer requirePositiveId(Long value, String label) {
+        if (value == null || value <= 0) {
+            throw new DomainValidationException(label + " non valido");
+        }
+        return value.intValue();
     }
 }

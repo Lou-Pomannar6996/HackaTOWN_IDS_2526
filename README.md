@@ -19,7 +19,7 @@ Backend Spring Boot (Java 21) per il progetto d'esame HackHub.
 ```
 2. Verifica che sia attiva:
 ```bash
-curl http://localhost:8082/
+curl http://localhost:8082/api/hackathons
 ```
 3. Header obbligatorio per le API protette logicamente: `X-USER-ID`
 
@@ -53,12 +53,12 @@ Variabili utili per MySQL:
 ```
 
 ## Setup dati minimi (H2)
-Ora esistono endpoint User per registrazione e login. Per provare le API, puoi creare utenti via `POST /api/users`
+Per provare le API in Postman, puoi creare utenti via `POST /api/users`
 e poi fare login con `POST /api/auth/login` per ottenere l'id utente.
 
-Se vuoi inserire manualmente utenti nel DB (H2 console: `http://localhost:8082/h2-console`), puoi continuare
-a usare SQL. Nota: `password_hash` e opzionale; senza di essa la login fallira, ma puoi comunque usare l'`X-USER-ID`
-per le API che lo richiedono.
+Se vuoi inserire manualmente utenti nel DB (H2 console: `http://localhost:8082/h2-console`), puoi usare SQL.
+Nota: `password_hash` deve contenere una hash BCrypt valida se vuoi usare la login. In alternativa,
+puoi registrare utenti via API e usare direttamente l'`X-USER-ID` nelle chiamate protette.
 Credenziali H2 di default:
 - JDBC URL: `jdbc:h2:mem:hackhub`
 - User: `sa`
@@ -66,15 +66,19 @@ Credenziali H2 di default:
 
 Esempio SQL minimo:
 ```sql
-insert into users (id, email, name) values (1, 'org@hackhub.dev', 'Organizer');
-insert into users (id, email, name) values (2, 'judge@hackhub.dev', 'Judge');
-insert into users (id, email, name) values (3, 'mentor@hackhub.dev', 'Mentor');
-insert into users (id, email, name) values (4, 'member@hackhub.dev', 'Member');
+insert into users (id, email, nome, cognome, password_hash)
+values (1, 'org@hackhub.dev', 'Organizer', 'One', null);
+insert into users (id, email, nome, cognome, password_hash)
+values (2, 'judge@hackhub.dev', 'Judge', 'Two', null);
+insert into users (id, email, nome, cognome, password_hash)
+values (3, 'mentor@hackhub.dev', 'Mentor', 'Three', null);
+insert into users (id, email, nome, cognome, password_hash)
+values (4, 'member@hackhub.dev', 'Member', 'Four', null);
 
-insert into user_roles (user_id, roles) values (1, 'ORGANIZER');
-insert into user_roles (user_id, roles) values (2, 'JUDGE');
-insert into user_roles (user_id, roles) values (3, 'MENTOR');
-insert into user_roles (user_id, roles) values (4, 'REGISTERED_USER');
+insert into user_roles (user_id, role) values (1, 'ORGANIZER');
+insert into user_roles (user_id, role) values (2, 'JUDGE');
+insert into user_roles (user_id, role) values (3, 'MENTOR');
+insert into user_roles (user_id, role) values (4, 'REGISTERED_USER');
 ```
 
 ## Login e registrazione (curl)
@@ -102,6 +106,13 @@ curl -X POST http://localhost:8082/api/auth/login \
 
 ## Admin: assegna ruoli (curl)
 Nota: richiede che l'utente chiamante abbia ruolo `ADMIN`.
+Se non hai un admin, crea uno in H2:
+```sql
+insert into users (id, email, nome, cognome, password_hash)
+values (99, 'admin@hackhub.dev', 'Admin', 'User', null);
+insert into user_roles (user_id, role) values (99, 'ADMIN');
+```
+Ruoli validi: `ADMIN`, `ORGANIZER`, `JUDGE`, `MENTOR`, `REGISTERED_USER`.
 ```bash
 curl -X PUT http://localhost:8082/api/admin/users/1/roles \
   -H "Content-Type: application/json" \
@@ -111,87 +122,136 @@ curl -X PUT http://localhost:8082/api/admin/users/1/roles \
   }'
 ```
 
-## 5 endpoint chiave (curl)
+## Flusso Postman completo (esempio)
 Negli esempi seguenti usa la porta effettiva scelta in avvio (`8082` o alternativa).
+Per le operazioni con utente loggato aggiungi header `X-USER-ID`.
 
-1. Crea hackathon
+1. Crea utenti (organizzatore, giudice, mentore, membro team)
+```bash
+curl -X POST http://localhost:8082/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"org@hackhub.dev","password":"Password123","nome":"Org","cognome":"One"}'
+curl -X POST http://localhost:8082/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"judge@hackhub.dev","password":"Password123","nome":"Judge","cognome":"Two"}'
+curl -X POST http://localhost:8082/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"mentor@hackhub.dev","password":"Password123","nome":"Mentor","cognome":"Three"}'
+curl -X POST http://localhost:8082/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"member@hackhub.dev","password":"Password123","nome":"Member","cognome":"Four"}'
+```
+
+2. Crea hackathon (organizzatore)
 ```bash
 curl -X POST http://localhost:8082/api/hackathons \
   -H "Content-Type: application/json" \
   -H "X-USER-ID: 1" \
   -d '{
     "name": "HackHub 2026",
+    "description": "Hackathon demo",
     "rules": "General rules",
-    "registrationDeadline": "2026-03-01T18:00:00",
-    "startDate": "2026-03-02T09:00:00",
-    "endDate": "2026-03-03T18:00:00",
+    "registrationDeadline": "2026-02-01T09:00:00",
+    "startDate": "2026-02-02T09:00:00",
+    "endDate": "2026-02-03T18:00:00",
     "location": "Ancona",
     "prizeMoney": 1500,
     "maxTeamSize": 5,
-    "judgeUserId": 2,
-    "mentorUserIds": [3],
-    "scoringPolicyType": "INNOVATION_WEIGHTED",
-    "validationPolicyType": "REPO_REQUIRED"
+    "giudiceId": 2,
+    "mentoriIds": [3]
   }'
 ```
 
-2. Crea team
+3. Crea team (membro team)
 ```bash
 curl -X POST http://localhost:8082/api/teams \
   -H "Content-Type: application/json" \
   -H "X-USER-ID: 4" \
-  -d '{
-    "name": "TeamAlpha",
-    "maxSize": 4
-  }'
+  -d '{"name":"TeamAlpha","maxSize":4}'
 ```
 
-3. Iscrivi team a hackathon
+4. Iscrivi team a hackathon
 ```bash
-curl -X POST http://localhost:8082/api/hackathons/1/registrations \
-  -H "Content-Type: application/json" \
-  -H "X-USER-ID: 4" \
-  -d '{
-    "teamId": 1
-  }'
+curl -X POST http://localhost:8082/api/hackathons/1/teams/1/registrations \
+  -H "X-USER-ID: 4"
 ```
 
-4. Avvia hackathon e invia submission
+5. Carica sottomissione
 ```bash
-curl -X POST http://localhost:8082/api/hackathons/1/start -H "X-USER-ID: 1"
-
 curl -X POST http://localhost:8082/api/hackathons/1/submissions \
   -H "Content-Type: application/json" \
   -H "X-USER-ID: 4" \
-  -d '{
-    "repoUrl": "https://github.com/teamalpha/project",
-    "description": "Detailed project description with enough characters for validation strategy"
-  }'
+  -d '{"title":"Project Alpha","description":"Demo","repoUrl":"https://github.com/teamalpha/project"}'
 ```
 
-5. Valuta e proclama vincitore
+6. Aggiorna stato hackathon (organizzatore)
 ```bash
-curl -X POST http://localhost:8082/api/hackathons/1/start-evaluation -H "X-USER-ID: 1"
+curl -X PUT http://localhost:8082/api/hackathons/1/status \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 1" \
+  -d '{"nuovoStato":"IN_CORSO"}'
 
-curl -X POST http://localhost:8082/api/submissions/1/evaluations \
+curl -X PUT http://localhost:8082/api/hackathons/1/status \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 1" \
+  -d '{"nuovoStato":"IN_VALUTAZIONE"}'
+```
+Nota: le transizioni sono vincolate alle date. Se la transizione fallisce, imposta `registrationDeadline`,
+`startDate` ed `endDate` nel passato quando crei l'hackathon.
+
+7. Valuta sottomissione (giudice)
+```bash
+curl -X GET http://localhost:8082/api/submissions/judge -H "X-USER-ID: 2"
+
+curl -X POST http://localhost:8082/api/submissions/1/evaluation \
   -H "Content-Type: application/json" \
   -H "X-USER-ID: 2" \
-  -d '{
-    "judgeScore": 8.5,
-    "innovationScore": 9.0,
-    "technicalScore": 7.5,
-    "comment": "Strong project"
-  }'
-
-curl -X POST http://localhost:8082/api/hackathons/1/declare-winner -H "X-USER-ID: 1"
+  -d '{"punteggio":8,"giudizio":"Progetto solido"}'
 ```
 
-6. Elimina hackathon (esempio: id `2`)
+8. Proclama vincitore ed eroga premio (organizzatore)
 ```bash
-curl -X DELETE http://localhost:8082/api/hackathons/2 \
-  -H "X-USER-ID: 1"
+curl -X GET http://localhost:8082/api/hackathons/1/winner/candidates -H "X-USER-ID: 1"
+
+curl -X POST http://localhost:8082/api/hackathons/1/winner/1 -H "X-USER-ID: 1"
+
+curl -X POST http://localhost:8082/api/pagamenti/hackathons/1/prize -H "X-USER-ID: 1"
 ```
-Nota: la cancellazione e consentita solo all'organizer assegnato a quell'hackathon.
+
+9. Supporto e call (mentore)
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/support-requests \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 4" \
+  -d '{"message":"Serve aiuto su API"}'
+
+curl -X GET http://localhost:8082/api/support-requests/mentor -H "X-USER-ID: 3"
+
+curl -X POST http://localhost:8082/api/support-requests/1/propose-call \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 3" \
+  -d '{"slotPreferiti":["2026-02-02T10:00:00","2026-02-02T11:00:00"]}'
+```
+
+10. Inviti team
+```bash
+curl -X POST http://localhost:8082/api/invites \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 4" \
+  -d '{"destinatarioId":2,"teamId":1}'
+
+curl -X GET http://localhost:8082/api/invites -H "X-USER-ID: 2"
+
+curl -X POST http://localhost:8082/api/invites/1/accept -H "X-USER-ID: 2"
+```
+
+11. Segnalazione violazione (mentore)
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/violations \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 3" \
+  -d '{"descrizione":"Team ha copiato codice","motivazione":"Violazione regolamento"}'
+```
 
 ## Dove sono applicati i pattern
 ### Strategy
@@ -209,7 +269,6 @@ Nota: la cancellazione e consentita solo all'organizer assegnato a quell'hackath
   - `SubmissionValidationStrategyRegistry`
 
 Uso nel service:
-- `src/main/java/it/ids/hackathown/service/EvaluationService.java` (scoring)
 - `src/main/java/it/ids/hackathown/service/SubmissionService.java` (validation)
 
 ### State
@@ -225,10 +284,8 @@ Uso nel service:
 
 Uso nel service:
 - `src/main/java/it/ids/hackathown/service/HackathonService.java`
-- `src/main/java/it/ids/hackathown/service/RegistrationService.java`
 - `src/main/java/it/ids/hackathown/service/SubmissionService.java`
-- `src/main/java/it/ids/hackathown/service/SupportService.java`
-- `src/main/java/it/ids/hackathown/service/EvaluationService.java`
+- `src/main/java/it/ids/hackathown/service/SupportoService.java`
 
 ## Adapter esterni (stub)
 - Calendar: `src/main/java/it/ids/hackathown/integration/calendar`

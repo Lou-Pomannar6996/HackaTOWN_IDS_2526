@@ -132,6 +132,7 @@ public class ApiMapper {
             violation.getId() == null ? null : violation.getId().longValue(),
             violation.getHackathon() == null ? null : violation.getHackathon().getId().longValue(),
             violation.getMentore() == null ? null : violation.getMentore().getId().longValue(),
+            violation.getDescrizione(),
             violation.getMotivazione(),
             violation.getDataSegnalazione(),
             violation.getStato()

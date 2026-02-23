@@ -26,7 +26,12 @@ public class ViolationService {
     private final NotificationService notificationService;
 
     @Transactional
-    public void segnalaViolazione(Integer mentoreId, Integer hackathonId, String motivazione) {
+    public void segnalaViolazione(
+        Integer mentoreId,
+        Integer hackathonId,
+        String descrizione,
+        String motivazione
+    ) {
         if (mentoreId == null || hackathonId == null) {
             throw new DomainValidationException("Dati non validi");
         }
@@ -42,6 +47,9 @@ public class ViolationService {
         Hackathon hackathon = hackathonRepository.findById(hackathonId)
             .orElseThrow(() -> new NotFoundException("Hackathon non trovato"));
 
+        if (descrizione == null || descrizione.isBlank()) {
+            throw new DomainValidationException("Descrizione non valida");
+        }
         if (motivazione == null || motivazione.isBlank()) {
             throw new DomainValidationException("Motivazione non valida");
         }
@@ -52,6 +60,7 @@ public class ViolationService {
         SegnalaViolazione segnalazione = SegnalaViolazione.builder()
             .hackathon(hackathon)
             .mentore(mentore)
+            .descrizione(descrizione.trim())
             .motivazione(motivazione.trim())
             .dataSegnalazione(LocalDateTime.now())
             .stato(StatoSegnalazione.INVIATA)

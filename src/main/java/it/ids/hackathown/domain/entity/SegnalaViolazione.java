@@ -43,6 +43,9 @@ public class SegnalaViolazione {
     @JoinColumn(name = "mentor_id")
     private Utente mentore;
 
+    @Column(nullable = false, length = 4000)
+    private String descrizione;
+
     @Column(nullable = false, length = 2000)
     private String motivazione;
 

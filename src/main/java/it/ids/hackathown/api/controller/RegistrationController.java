@@ -3,7 +3,8 @@ package it.ids.hackathown.api.controller;
 import it.ids.hackathown.api.dto.request.RegisterTeamRequest;
 import it.ids.hackathown.api.dto.response.RegistrationResponse;
 import it.ids.hackathown.api.mapper.ApiMapper;
-import it.ids.hackathown.service.RegistrationService;
+import it.ids.hackathown.domain.exception.DomainValidationException;
+import it.ids.hackathown.service.HackathonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RegistrationController {
 
-    private final RegistrationService registrationService;
+    private final HackathonService hackathonService;
     private final ApiMapper mapper;
 
     @PostMapping("/{hackathonId}/registrations")
@@ -29,9 +30,22 @@ public class RegistrationController {
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody RegisterTeamRequest request
     ) {
+        if (currentUserId == null || currentUserId <= 0) {
+            throw new DomainValidationException("Utente non valido");
+        }
         RegistrationResponse response = mapper.toResponse(
-            registrationService.registerTeam(hackathonId, request.teamId(), currentUserId)
+            hackathonService.iscriviTeam(
+                requirePositiveId(hackathonId, "Hackathon"),
+                requirePositiveId(request.teamId(), "Team")
+            )
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    private Integer requirePositiveId(Long value, String label) {
+        if (value == null || value <= 0) {
+            throw new DomainValidationException(label + " non valido");
+        }
+        return value.intValue();
     }
 }

@@ -1,16 +1,14 @@
 package it.ids.hackathown.api.controller;
 
 import it.ids.hackathown.api.dto.request.CreateTeamRequest;
-import it.ids.hackathown.api.dto.request.InviteUserRequest;
-import it.ids.hackathown.api.dto.response.InviteResponse;
 import it.ids.hackathown.api.dto.response.TeamResponse;
 import it.ids.hackathown.api.mapper.ApiMapper;
+import it.ids.hackathown.domain.exception.DomainValidationException;
 import it.ids.hackathown.service.TeamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,25 +28,25 @@ public class TeamController {
         @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
         @Valid @RequestBody CreateTeamRequest request
     ) {
-        TeamResponse response = mapper.toResponse(teamService.creaTeam(currentUserId, request.name(), request.maxSize()));
+        if (request == null || request.name() == null || request.name().isBlank()) {
+            throw new DomainValidationException("Nome team non valido");
+        }
+        TeamResponse response = mapper.toResponse(
+            teamService.creaTeam(request.name(), requirePositiveId(currentUserId, "Utente"))
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/{teamId}/invites")
-    public ResponseEntity<InviteResponse> inviteUser(
-        @PathVariable Long teamId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
-        @Valid @RequestBody InviteUserRequest request
-    ) {
-        InviteResponse response = mapper.toResponse(teamService.inviteUser(teamId, currentUserId, request.email()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @PostMapping("/leave")
+    public ResponseEntity<Void> abbandonaTeam(@RequestHeader(HeaderConstants.USER_ID) Long currentUserId) {
+        teamService.abbandonaTeam(requirePositiveId(currentUserId, "Utente"));
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{teamId}/leave")
-    public TeamResponse abbandonaTeam(
-        @PathVariable Long teamId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
-    ) {
-        return mapper.toResponse(teamService.abbandonaTeam(teamId, currentUserId));
+    private Integer requirePositiveId(Long value, String label) {
+        if (value == null || value <= 0) {
+            throw new DomainValidationException(label + " non valido");
+        }
+        return value.intValue();
     }
 }

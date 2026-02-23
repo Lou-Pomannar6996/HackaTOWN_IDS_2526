@@ -7,7 +7,8 @@ public record ViolationResponse(
     Long id,
     Long hackathonId,
     Long mentorId,
-    String reason,
+    String descrizione,
+    String motivazione,
     LocalDateTime createdAt,
     StatoSegnalazione status
 ) {
