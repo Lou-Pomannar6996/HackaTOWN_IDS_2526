@@ -80,6 +80,15 @@ insert into user_roles (user_id, role) values (2, 'JUDGE');
 insert into user_roles (user_id, role) values (3, 'MENTOR');
 insert into user_roles (user_id, role) values (4, 'REGISTERED_USER');
 ```
+Nota: richiede che l'utente chiamante abbia ruolo `ADMIN`.
+Se non hai un admin, crea uno in H2:
+
+```sql
+insert into users (id, email, nome, cognome, password_hash)
+values (99, 'admin@hackhub.dev', 'Admin', 'User', null);
+insert into user_roles (user_id, role) values (99, 'ADMIN');
+```
+Ruoli validi: `ADMIN`, `ORGANIZER`, `JUDGE`, `MENTOR`, `REGISTERED_USER`.
 
 ## Login e registrazione (curl)
 Registrazione utente:
@@ -101,24 +110,6 @@ curl -X POST http://localhost:8082/api/auth/login \
   -d '{
     "email": "user@hackhub.dev",
     "password": "Password123"
-  }'
-```
-
-## Admin: assegna ruoli (curl)
-Nota: richiede che l'utente chiamante abbia ruolo `ADMIN`.
-Se non hai un admin, crea uno in H2:
-```sql
-insert into users (id, email, nome, cognome, password_hash)
-values (99, 'admin@hackhub.dev', 'Admin', 'User', null);
-insert into user_roles (user_id, role) values (99, 'ADMIN');
-```
-Ruoli validi: `ADMIN`, `ORGANIZER`, `JUDGE`, `MENTOR`, `REGISTERED_USER`.
-```bash
-curl -X PUT http://localhost:8082/api/admin/users/1/roles \
-  -H "Content-Type: application/json" \
-  -H "X-USER-ID: 99" \
-  -d '{
-    "roles": ["ORGANIZER", "JUDGE"]
   }'
 ```
 
@@ -260,7 +251,7 @@ curl -X POST http://localhost:8082/api/hackathons/1/violations \
   -d '{"descrizione":"Team ha copiato codice","motivazione":"Violazione regolamento"}'
 ```
 
-## API per ciascun caso d'uso
+## API per ciascun caso d'uso (API GENERATE AD HOC PER TESTING CASI D'USO)
 1. Registrarsi alla piattaforma
 ```bash
 curl -X POST http://localhost:8082/api/users \
