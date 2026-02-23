@@ -24,19 +24,19 @@ public class AdminController {
 
     @PutMapping("/users/{userId}/roles")
     public UserResponse updateUserRoles(
-            @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
-            @PathVariable Long userId,
+            @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
+            @PathVariable Integer userId,
             @Valid @RequestBody UpdateUserRolesRequest request
     ) {
         Integer adminId = requirePositiveId(currentUserId, "Admin");
         Integer targetId = requirePositiveId(userId, "Utente");
-        return mapper.toResponse(utenteService.assignRoles(adminId.longValue(), targetId.longValue(), request.roles()));
+        return mapper.toResponse(utenteService.assignRoles(adminId, targetId, request.roles()));
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

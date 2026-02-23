@@ -26,8 +26,8 @@ public class EvaluationController {
 
     @PostMapping("/submissions/{submissionId}/evaluations")
     public EvaluationResponse evaluateSubmission(
-        @PathVariable Long submissionId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @PathVariable Integer submissionId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody EvaluateSubmissionRequest request
     ) {
         return mapper.toResponse(submissionService.salvaValutazione(
@@ -40,8 +40,8 @@ public class EvaluationController {
 
     @GetMapping("/hackathons/{hackathonId}/evaluations")
     public List<EvaluationResponse> listEvaluations(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         return submissionService.listValutazioni(
             requirePositiveId(hackathonId, "Hackathon"),
@@ -52,10 +52,10 @@ public class EvaluationController {
             .toList();
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

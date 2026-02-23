@@ -23,8 +23,8 @@ public class ViolationController {
 
     @PostMapping("/{hackathonId}/violations")
     public ResponseEntity<String> segnalaViolazione(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody ReportViolationRequest request
     ) {
         violationService.segnalaViolazione(
@@ -36,10 +36,10 @@ public class ViolationController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Segnalazione inviata con successo");
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

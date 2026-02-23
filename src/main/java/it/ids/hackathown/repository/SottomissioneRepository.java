@@ -4,6 +4,8 @@ import it.ids.hackathown.domain.entity.Sottomissione;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface SottomissioneRepository extends JpaRepository<Sottomissione, Integer> {
 
@@ -13,13 +15,22 @@ public interface SottomissioneRepository extends JpaRepository<Sottomissione, In
 
     List<Sottomissione> findByIscrizione_Hackathon_Id(Integer hackathonId);
 
+    @Query("""
+        select distinct s
+        from Sottomissione s
+        join fetch s.iscrizione i
+        join fetch i.team t
+        where i.hackathon.id = :hackathonId
+        """)
+    List<Sottomissione> findByHackathonIdWithTeam(@Param("hackathonId") Integer hackathonId);
+
     void deleteByIscrizione_Hackathon_Id(Integer hackathonId);
 
-    Optional<Sottomissione> findByIscrizione_Id(Long iscrizioneId);
+    Optional<Sottomissione> findByIscrizione_Id(Integer iscrizioneId);
 
     List<Sottomissione> findByIscrizione_Hackathon_IdIn(List<Integer> hackathonIds);
 
-    default Optional<Sottomissione> findByIscrizioneId(Long iscrizioneId) {
+    default Optional<Sottomissione> findByIscrizioneId(Integer iscrizioneId) {
         if (iscrizioneId == null) {
             return Optional.empty();
         }

@@ -4,8 +4,8 @@ import it.ids.hackathown.domain.enums.StatoInvito;
 import java.time.LocalDateTime;
 
 public record InviteResponse(
-    Long id,
-    Long teamId,
+    Integer id,
+    Integer teamId,
     String invitedEmail,
     StatoInvito status,
     LocalDateTime createdAt

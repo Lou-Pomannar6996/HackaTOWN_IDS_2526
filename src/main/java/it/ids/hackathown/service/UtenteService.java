@@ -66,19 +66,19 @@ public class UtenteService {
     }
 
     @Transactional
-    public Utente assignRoles(Long adminUserId, Long userId, Set<it.ids.hackathown.domain.enums.UserRole> roles) {
+    public Utente assignRoles(Integer adminUserId, Integer userId, Set<it.ids.hackathown.domain.enums.UserRole> roles) {
         if (adminUserId == null || adminUserId <= 0 || userId == null || userId <= 0) {
             throw new DomainValidationException("Id non valido");
         }
         if (roles == null || roles.isEmpty()) {
             throw new DomainValidationException("Ruoli non validi");
         }
-        Utente admin = utenteRepository.findById(adminUserId.intValue())
+        Utente admin = utenteRepository.findById(adminUserId)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
         if (admin.getRoles() == null || !admin.getRoles().contains(it.ids.hackathown.domain.enums.UserRole.ADMIN)) {
             throw new ForbiddenActionForState("Operazione non autorizzata");
         }
-        Utente target = utenteRepository.findById(userId.intValue())
+        Utente target = utenteRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
         target.setRoles(new HashSet<>(roles));
         return utenteRepository.save(target);

@@ -28,7 +28,7 @@ public class EsitoHackathon {
 
     @Id
     @Column(name = "hackathon_id")
-    private Long id;
+    private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId

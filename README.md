@@ -151,9 +151,9 @@ curl -X POST http://localhost:8082/api/hackathons \
     "name": "HackHub 2026",
     "description": "Hackathon demo",
     "rules": "General rules",
-    "registrationDeadline": "2026-02-01T09:00:00",
-    "startDate": "2026-02-02T09:00:00",
-    "endDate": "2026-02-03T18:00:00",
+    "registrationDeadline": "2026-01-10T09:00:00",
+    "startDate": "2026-01-11T09:00:00",
+    "endDate": "2026-01-12T18:00:00",
     "location": "Ancona",
     "prizeMoney": 1500,
     "maxTeamSize": 5,
@@ -176,17 +176,10 @@ curl -X POST http://localhost:8082/api/hackathons/1/teams/1/registrations \
   -H "X-USER-ID: 4"
 ```
 
-5. Aggiorna stato hackathon (organizzatore)
+5. Avvia hackathon (organizzatore)
 ```bash
-curl -X PUT http://localhost:8082/api/hackathons/1/status \
-  -H "Content-Type: application/json" \
+curl -X POST http://localhost:8082/api/hackathons/1/start \
   -H "X-USER-ID: 1" \
-  -d '{"nuovoStato":"IN_CORSO"}'
-
-curl -X PUT http://localhost:8082/api/hackathons/1/status \
-  -H "Content-Type: application/json" \
-  -H "X-USER-ID: 1" \
-  -d '{"nuovoStato":"IN_VALUTAZIONE"}'
 ```
 Nota: le transizioni sono vincolate alle date. Se la transizione fallisce, imposta `registrationDeadline`,
 `startDate` ed `endDate` nel passato quando crei l'hackathon.
@@ -199,7 +192,13 @@ curl -X POST http://localhost:8082/api/hackathons/1/submissions \
   -d '{"title":"Project Alpha","description":"Demo","repoUrl":"https://github.com/teamalpha/project"}'
 ```
 
-7. Valuta sottomissione (giudice)
+7. Avvia valutazione (organizzatore)
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/start-evaluation \
+  -H "X-USER-ID: 1"
+```
+
+8. Valuta sottomissione (giudice)
 ```bash
 curl -X GET http://localhost:8082/api/submissions/judge -H "X-USER-ID: 2"
 
@@ -209,16 +208,24 @@ curl -X POST http://localhost:8082/api/submissions/1/evaluation \
   -d '{"punteggio":8,"giudizio":"Progetto solido"}'
 ```
 
-8. Proclama vincitore ed eroga premio (organizzatore)
+9. Proclama vincitore (organizzatore)
 ```bash
 curl -X GET http://localhost:8082/api/hackathons/1/winner/candidates -H "X-USER-ID: 1"
 
 curl -X POST http://localhost:8082/api/hackathons/1/winner/1 -H "X-USER-ID: 1"
+```
 
+10. Concludi hackathon (organizzatore)
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/conclude -H "X-USER-ID: 1"
+```
+
+11. Eroga premio (organizzatore)
+```bash
 curl -X POST http://localhost:8082/api/pagamenti/hackathons/1/prize -H "X-USER-ID: 1"
 ```
 
-9. Supporto e call (mentore)
+12. Supporto e call (mentore)
 ```bash
 curl -X POST http://localhost:8082/api/hackathons/1/support-requests \
   -H "Content-Type: application/json" \
@@ -233,7 +240,7 @@ curl -X POST http://localhost:8082/api/support-requests/1/propose-call \
   -d '{"slotPreferiti":["2026-02-02T10:00:00","2026-02-02T11:00:00"]}'
 ```
 
-10. Inviti team
+13. Inviti team
 ```bash
 curl -X POST http://localhost:8082/api/invites \
   -H "Content-Type: application/json" \
@@ -245,7 +252,179 @@ curl -X GET http://localhost:8082/api/invites -H "X-USER-ID: 2"
 curl -X POST http://localhost:8082/api/invites/1/accept -H "X-USER-ID: 2"
 ```
 
-11. Segnalazione violazione (mentore)
+14. Segnalazione violazione (mentore)
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/violations \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 3" \
+  -d '{"descrizione":"Team ha copiato codice","motivazione":"Violazione regolamento"}'
+```
+
+## API per ciascun caso d'uso (cerchi blu)
+1. Registrarsi alla piattaforma
+```bash
+curl -X POST http://localhost:8082/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@hackhub.dev","password":"Password123","nome":"Mario","cognome":"Rossi"}'
+```
+
+2. Effettuare login
+```bash
+curl -X POST http://localhost:8082/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@hackhub.dev","password":"Password123"}'
+```
+
+3. Consultare elenco hackathon
+```bash
+curl -X GET http://localhost:8082/api/hackathons
+```
+
+4. Creare hackathon (include assegnazione giudice e mentori)
+```bash
+curl -X POST http://localhost:8082/api/hackathons \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 1" \
+  -d '{
+    "name": "HackHub 2026",
+    "description": "Hackathon demo",
+    "rules": "General rules",
+    "registrationDeadline": "2026-01-10T09:00:00",
+    "startDate": "2026-01-11T09:00:00",
+    "endDate": "2026-01-12T18:00:00",
+    "location": "Ancona",
+    "prizeMoney": 1500,
+    "maxTeamSize": 5,
+    "giudiceId": 2,
+    "mentoriIds": [3]
+  }'
+```
+
+5. Aggiungere mentore
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/mentors \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 1" \
+  -d '{"mentorUserId":3}'
+```
+
+6. Creare team
+```bash
+curl -X POST http://localhost:8082/api/teams \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 4" \
+  -d '{"name":"TeamAlpha","maxSize":4}'
+```
+
+7. Invitare utente a team
+```bash
+curl -X POST http://localhost:8082/api/invites \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 4" \
+  -d '{"destinatarioId":2,"teamId":1}'
+```
+
+8. Accettare invito a team
+```bash
+curl -X POST http://localhost:8082/api/invites/1/accept -H "X-USER-ID: 2"
+```
+
+9. Abbandonare team
+```bash
+curl -X POST http://localhost:8082/api/teams/leave -H "X-USER-ID: 4"
+```
+
+10. Iscrivere team a hackathon
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/teams/1/registrations \
+  -H "X-USER-ID: 4"
+```
+
+11. Verificare stato hackathon
+```bash
+curl -X GET http://localhost:8082/api/hackathons/1
+```
+
+12. Verificare requisiti team (controllo incluso nell'iscrizione)
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/teams/1/registrations \
+  -H "X-USER-ID: 4"
+```
+
+13. Caricare sottomissione
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/submissions \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 4" \
+  -d '{"title":"Project Alpha","description":"Demo","repoUrl":"https://github.com/teamalpha/project"}'
+```
+
+14. Visualizzare sottomissioni (giudice)
+```bash
+curl -X GET http://localhost:8082/api/submissions/judge -H "X-USER-ID: 2"
+```
+
+15. Valutare sottomissione (giudice)
+```bash
+curl -X POST http://localhost:8082/api/submissions/1/evaluation \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 2" \
+  -d '{"punteggio":8,"giudizio":"Progetto solido"}'
+```
+
+16. Inviare richiesta supporto
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/support-requests \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 4" \
+  -d '{"message":"Serve aiuto su API"}'
+```
+
+17. Visualizzare richiesta supporto (mentore)
+```bash
+curl -X GET http://localhost:8082/api/support-requests/mentor -H "X-USER-ID: 3"
+```
+
+18. Proporre call supporto (mentore)
+```bash
+curl -X POST http://localhost:8082/api/calls \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mentorId": 3,
+    "richiestaId": 1,
+    "dataProposta": "2026-02-26T10:00:00",
+    "durataMin": 30,
+    "calendarEventId": "CAL-1-1700000000000:2026-02-26T10:00:00"
+  }'
+```
+
+19. Pianificare call (mentore)
+```bash
+curl -X POST http://localhost:8082/api/support-requests/1/propose-call \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 3" \
+  -d '{"slotPreferiti":["2026-02-26T10:00:00","2026-02-26T11:00:00"]}'
+```
+
+20. Aggiornare stato hackathon
+```bash
+curl -X PUT http://localhost:8082/api/hackathons/1/status \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 1" \
+  -d '{"nuovoStato":"IN_VALUTAZIONE"}'
+```
+
+21. Proclamare team vincitore
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/winner/1 -H "X-USER-ID: 1"
+```
+
+22. Erogare premio
+```bash
+curl -X POST http://localhost:8082/api/pagamenti/hackathons/1/prize -H "X-USER-ID: 1"
+```
+
+23. Segnalare violazione (mentore)
 ```bash
 curl -X POST http://localhost:8082/api/hackathons/1/violations \
   -H "Content-Type: application/json" \

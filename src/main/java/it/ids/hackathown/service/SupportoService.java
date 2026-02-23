@@ -59,14 +59,7 @@ public class SupportoService {
             throw new ForbiddenActionForState("Operazione non autorizzata");
         }
 
-        List<String> partecipanti = new ArrayList<>();
-        partecipanti.add(String.valueOf(mentoreId));
-        Team team = richiesta.getTeam();
-        if (team != null) {
-            team.getMembri().forEach(membro -> partecipanti.add(String.valueOf(membro.getId())));
-        }
-
-        List<String> slotValidi = calendarService.createEvent(slotPreferiti, partecipanti);
+        List<String> slotValidi = calendarService.createEvent(slotPreferiti, List.of());
         if (slotValidi.isEmpty()) {
             return "NESSUNO_SLOT_DISPONIBILE";
         }

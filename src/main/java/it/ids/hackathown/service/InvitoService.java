@@ -133,6 +133,6 @@ public class InvitoService {
     }
 
     public List<Invito> getInviti(Integer utenteId) {
-        return invitoRepository.findByDestinatario_Id(utenteId);
+        return invitoRepository.findByDestinatarioIdWithDetails(utenteId);
     }
 }

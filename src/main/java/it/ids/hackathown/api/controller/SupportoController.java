@@ -29,8 +29,8 @@ public class SupportoController {
 
     @PostMapping("/hackathons/{hackathonId}/support-requests")
     public ResponseEntity<Void> inviaRichiestaSupporto(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody CreateSupportRequest request
     ) {
         supportoService.creaRichiestaSupporto(
@@ -42,7 +42,7 @@ public class SupportoController {
     }
 
     @GetMapping("/hackathons/{hackathonId}/support-requests")
-    public List<SupportRequestResponse> getRichieste(@PathVariable Long hackathonId) {
+    public List<SupportRequestResponse> getRichieste(@PathVariable Integer hackathonId) {
         return supportoService.listaRichieste(requirePositiveId(hackathonId, "Hackathon"))
             .stream()
             .map(mapper::toResponse)
@@ -51,8 +51,8 @@ public class SupportoController {
 
     @PostMapping("/support-requests/{supportRequestId}/propose-call")
     public ResponseEntity<String> pianificaCall(
-        @PathVariable Long supportRequestId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @PathVariable Integer supportRequestId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody PianificaCallRequest request
     ) {
         String calendarEventId = supportoService.pianificaCall(
@@ -68,7 +68,7 @@ public class SupportoController {
 
     @GetMapping("/support-requests/mentor")
     public List<SupportRequestResponse> getRichiesteSupportoMentore(
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         return supportoService.getRichiesteSupporto(requirePositiveId(currentUserId, "Mentore"))
             .stream()
@@ -76,10 +76,10 @@ public class SupportoController {
             .toList();
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

@@ -4,6 +4,7 @@ import it.ids.hackathown.api.dto.request.AddMentorRequest;
 import it.ids.hackathown.api.dto.request.AggiornaStatoRequest;
 import it.ids.hackathown.api.dto.request.CreateHackathonRequest;
 import it.ids.hackathown.api.dto.response.AggiornaStatoFormResponse;
+import it.ids.hackathown.api.dto.response.ApiResponse;
 import it.ids.hackathown.api.dto.response.HackathonResponse;
 import it.ids.hackathown.api.dto.response.TeamResponse;
 import it.ids.hackathown.api.mapper.ApiMapper;
@@ -42,7 +43,7 @@ public class HackathonController {
 
     @PostMapping
     public ResponseEntity<HackathonResponse> creaHackathon(
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody CreateHackathonRequest request
     ) {
         if (request == null) {
@@ -70,8 +71,8 @@ public class HackathonController {
 
     @PostMapping("/{hackathonId}/teams/{teamId}/registrations")
     public ResponseEntity<Void> iscriviTeam(
-        @PathVariable Long hackathonId,
-        @PathVariable Long teamId
+        @PathVariable Integer hackathonId,
+        @PathVariable Integer teamId
     ) {
         hackathonService.iscriviTeam(
             requirePositiveId(hackathonId, "Hackathon"),
@@ -82,7 +83,7 @@ public class HackathonController {
 
     @PostMapping("/{hackathonId}/mentors")
     public ResponseEntity<Void> aggiungiMentore(
-        @PathVariable Long hackathonId,
+        @PathVariable Integer hackathonId,
         @Valid @RequestBody AddMentorRequest request
     ) {
         hackathonService.aggiungiMentore(
@@ -94,8 +95,8 @@ public class HackathonController {
 
     @PostMapping("/{hackathonId}/teams/{teamId}/prize")
     public ResponseEntity<String> erogaPremio(
-        @PathVariable Long hackathonId,
-        @PathVariable Long teamId
+        @PathVariable Integer hackathonId,
+        @PathVariable Integer teamId
     ) {
         String result = hackathonService.erogaPremio(
             requirePositiveId(hackathonId, "Hackathon"),
@@ -104,16 +105,40 @@ public class HackathonController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping("/{hackathonId}/start")
+    public ResponseEntity<ApiResponse> avviaHackathon(
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
+    ) {
+        hackathonService.avviaHackathon(
+            requirePositiveId(hackathonId, "Hackathon"),
+            requirePositiveId(currentUserId, "Organizzatore")
+        );
+        return ResponseEntity.ok(new ApiResponse("Hackathon avviato", null));
+    }
+
+    @PostMapping("/{hackathonId}/start-evaluation")
+    public ResponseEntity<ApiResponse> avviaValutazione(
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
+    ) {
+        hackathonService.avviaValutazione(
+            requirePositiveId(hackathonId, "Hackathon"),
+            requirePositiveId(currentUserId, "Organizzatore")
+        );
+        return ResponseEntity.ok(new ApiResponse("Valutazione avviata", null));
+    }
+
     @GetMapping("/{hackathonId}")
-    public HackathonResponse getDettaglioHackathon(@PathVariable Long hackathonId) {
+    public HackathonResponse getDettaglioHackathon(@PathVariable Integer hackathonId) {
         Hackathon hackathon = hackathonService.getDettaglioHackathon(requirePositiveId(hackathonId, "Hackathon"));
         return hackathon == null ? null : mapper.toResponse(hackathon);
     }
 
     @GetMapping("/{hackathonId}/status/form")
     public AggiornaStatoFormResponse getFormAggiornaStato(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         AggiornaStatoFormDTO form = hackathonService.getFormAggiornaStato(
             requirePositiveId(hackathonId, "Hackathon"),
@@ -123,9 +148,9 @@ public class HackathonController {
     }
 
     @PutMapping("/{hackathonId}/status")
-    public ResponseEntity<Void> aggiornaStato(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+    public ResponseEntity<ApiResponse> aggiornaStato(
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody AggiornaStatoRequest request
     ) {
         if (request == null || request.nuovoStato() == null || request.nuovoStato().isBlank()) {
@@ -136,13 +161,25 @@ public class HackathonController {
             requirePositiveId(currentUserId, "Organizzatore"),
             request.nuovoStato()
         );
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse("Stato aggiornato", null));
+    }
+
+    @PostMapping("/{hackathonId}/conclude")
+    public ResponseEntity<ApiResponse> concludiHackathon(
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
+    ) {
+        hackathonService.concludiHackathon(
+            requirePositiveId(hackathonId, "Hackathon"),
+            requirePositiveId(currentUserId, "Organizzatore")
+        );
+        return ResponseEntity.ok(new ApiResponse("Hackathon concluso", null));
     }
 
     @GetMapping("/{hackathonId}/winner/candidates")
     public List<TeamResponse> preparaProclama(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         return hackathonService.preparaProclama(
             requirePositiveId(currentUserId, "Organizzatore"),
@@ -152,9 +189,9 @@ public class HackathonController {
 
     @PostMapping("/{hackathonId}/winner/{teamId}")
     public ResponseEntity<Void> proclamaVincitore(
-        @PathVariable Long hackathonId,
-        @PathVariable Long teamId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @PathVariable Integer hackathonId,
+        @PathVariable Integer teamId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         hackathonService.proclamaVincitore(
             requirePositiveId(currentUserId, "Organizzatore"),
@@ -164,10 +201,10 @@ public class HackathonController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

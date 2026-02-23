@@ -28,7 +28,7 @@ public class InvitoController {
 
     @PostMapping
     public ResponseEntity<Void> invitaUtente(
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody InvitaUtenteRequest request
     ) {
         invitoService.invitaUtenteATeam(
@@ -41,8 +41,8 @@ public class InvitoController {
 
     @PostMapping("/{inviteId}/accept")
     public ResponseEntity<Void> accettaInvito(
-        @PathVariable Long inviteId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @PathVariable Integer inviteId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         invitoService.accettaInvito(
             requirePositiveId(inviteId, "Invito"),
@@ -52,18 +52,11 @@ public class InvitoController {
     }
 
     @GetMapping
-    public List<InviteResponse> getInvitiUtente(@RequestHeader(HeaderConstants.USER_ID) Long currentUserId) {
+    public List<InviteResponse> getInvitiUtente(@RequestHeader(HeaderConstants.USER_ID) Integer currentUserId) {
         return invitoService.getInviti(requirePositiveId(currentUserId, "Utente"))
             .stream()
             .map(mapper::toResponse)
             .toList();
-    }
-
-    private Integer requirePositiveId(Long value, String label) {
-        if (value == null || value <= 0) {
-            throw new DomainValidationException(label + " non valido");
-        }
-        return value.intValue();
     }
 
     private Integer requirePositiveId(Integer value, String label) {

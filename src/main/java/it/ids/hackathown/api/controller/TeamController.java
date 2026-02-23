@@ -25,7 +25,7 @@ public class TeamController {
 
     @PostMapping
     public ResponseEntity<TeamResponse> creaTeam(
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody CreateTeamRequest request
     ) {
         if (request == null || request.name() == null || request.name().isBlank()) {
@@ -42,15 +42,15 @@ public class TeamController {
     }
 
     @PostMapping("/leave")
-    public ResponseEntity<Void> abbandonaTeam(@RequestHeader(HeaderConstants.USER_ID) Long currentUserId) {
+    public ResponseEntity<Void> abbandonaTeam(@RequestHeader(HeaderConstants.USER_ID) Integer currentUserId) {
         teamService.abbandonaTeam(requirePositiveId(currentUserId, "Utente"));
         return ResponseEntity.ok().build();
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

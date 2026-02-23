@@ -4,9 +4,9 @@ import it.ids.hackathown.domain.enums.StatoSegnalazione;
 import java.time.LocalDateTime;
 
 public record ViolationResponse(
-    Long id,
-    Long hackathonId,
-    Long mentorId,
+    Integer id,
+    Integer hackathonId,
+    Integer mentorId,
     String descrizione,
     String motivazione,
     LocalDateTime createdAt,

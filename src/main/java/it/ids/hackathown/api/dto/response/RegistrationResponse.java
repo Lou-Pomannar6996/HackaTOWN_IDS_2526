@@ -3,9 +3,9 @@ package it.ids.hackathown.api.dto.response;
 import java.time.LocalDateTime;
 
 public record RegistrationResponse(
-    Long id,
-    Long hackathonId,
-    Long teamId,
+    Integer id,
+    Integer hackathonId,
+    Integer teamId,
     LocalDateTime createdAt
 ) {
 }

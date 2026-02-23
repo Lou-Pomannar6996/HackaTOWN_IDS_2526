@@ -156,8 +156,8 @@ class HackathonIntegrationTest {
             .andExpect(jsonPath("$.paymentTxId", startsWith("pay-")))
             .andReturn();
 
-        EsitoHackathon winner = esitoHackathonRepository.findByHackathon_Id(hackathon.getId().longValue()).orElseThrow();
-        Hackathon updated = hackathonRepository.findById(hackathon.getId().longValue()).orElseThrow();
+        EsitoHackathon winner = esitoHackathonRepository.findByHackathonId(hackathon.getId()).orElseThrow();
+        Hackathon updated = hackathonRepository.findById(hackathon.getId()).orElseThrow();
 
         assertEquals(teamB.getId(), winner.getTeam().getId());
         assertEquals(StatoHackathon.CONCLUSO, updated.getStato());
@@ -239,22 +239,22 @@ class HackathonIntegrationTest {
             .build());
 
         EsitoHackathon winner = hackathonService.declareWinner(
-            hackathon.getId().longValue(),
-            organizer.getId().longValue()
+            hackathon.getId(),
+            organizer.getId()
         );
 
         mockMvc.perform(delete("/api/hackathons/{hackathonId}", hackathon.getId())
                 .header("X-USER-ID", organizer.getId()))
             .andExpect(status().isNoContent());
 
-        Long hackathonId = hackathon.getId().longValue();
+        Integer hackathonId = hackathon.getId();
         assertTrue(hackathonRepository.findById(hackathonId).isEmpty());
         assertTrue(iscrizioneRepository.findByHackathon_Id(hackathonId).isEmpty());
         assertTrue(sottomissioneRepository.findByIscrizione_Hackathon_Id(hackathonId).isEmpty());
         assertTrue(valutazioneRepository.findByHackathon_Id(hackathonId).isEmpty());
         assertTrue(richiestaSupportoRepository.findByHackathon_Id(hackathonId).isEmpty());
         assertTrue(segnalazioneValidazioneRepository.findByHackathon_Id(hackathonId).isEmpty());
-        assertTrue(!esitoHackathonRepository.existsByHackathon_Id(winner.getId()));
+        assertTrue(!esitoHackathonRepository.existsByHackathonId(winner.getId()));
     }
 
     private Utente saveUser(String email, String nome, Set<UserRole> roles) {

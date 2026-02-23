@@ -4,7 +4,7 @@ import it.ids.hackathown.domain.enums.StatoCall;
 import java.util.Date;
 
 public record CallProposalResponse(
-    Long id,
+    Integer id,
     Date dataProposta,
     Date dataInizio,
     Integer durataMin,

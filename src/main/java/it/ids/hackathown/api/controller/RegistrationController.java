@@ -26,8 +26,8 @@ public class RegistrationController {
 
     @PostMapping("/{hackathonId}/registrations")
     public ResponseEntity<RegistrationResponse> registerTeam(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody RegisterTeamRequest request
     ) {
         if (currentUserId == null || currentUserId <= 0) {
@@ -42,10 +42,10 @@ public class RegistrationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

@@ -31,8 +31,8 @@ public class SubmissionController {
 
     @GetMapping("/hackathons/{hackathonId}/submissions/form")
     public SubmissionResponse getSubmissionForm(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         return mapper.toResponse(submissionService.getSubmissionForm(
             requirePositiveId(currentUserId, "Utente"),
@@ -42,8 +42,8 @@ public class SubmissionController {
 
     @PostMapping("/hackathons/{hackathonId}/submissions")
     public ResponseEntity<Void> salvaSubmission(
-        @PathVariable Long hackathonId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @PathVariable Integer hackathonId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody UpsertSubmissionRequest request
     ) {
         Map<String, Object> payload = new HashMap<>();
@@ -60,7 +60,7 @@ public class SubmissionController {
 
     @GetMapping("/submissions/judge")
     public List<SubmissionResponse> getSottomissioniGiudice(
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         return submissionService.getSottomissioni(requirePositiveId(currentUserId, "Giudice"))
             .stream()
@@ -70,8 +70,8 @@ public class SubmissionController {
 
     @GetMapping("/submissions/{submissionId}")
     public SubmissionResponse getDettaglioSottomissione(
-        @PathVariable Long submissionId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId
+        @PathVariable Integer submissionId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId
     ) {
         return mapper.toResponse(submissionService.getDettaglioSottomissione(
             requirePositiveId(submissionId, "Sottomissione"),
@@ -81,8 +81,8 @@ public class SubmissionController {
 
     @PostMapping("/submissions/{submissionId}/evaluation")
     public ResponseEntity<Void> salvaValutazione(
-        @PathVariable Long submissionId,
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
+        @PathVariable Integer submissionId,
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
         @Valid @RequestBody EvaluateSubmissionRequest request
     ) {
         submissionService.salvaValutazione(
@@ -94,10 +94,10 @@ public class SubmissionController {
         return ResponseEntity.ok().build();
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }

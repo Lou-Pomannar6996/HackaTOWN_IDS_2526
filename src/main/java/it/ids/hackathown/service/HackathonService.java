@@ -17,6 +17,7 @@ import it.ids.hackathown.repository.EsitoHackathonRepository;
 import it.ids.hackathown.repository.HackathonRepository;
 import it.ids.hackathown.repository.IscrizioneRepository;
 import it.ids.hackathown.repository.SottomissioneRepository;
+import it.ids.hackathown.repository.TeamRepository;
 import it.ids.hackathown.repository.UtenteRepository;
 import it.ids.hackathown.repository.ValutazioneRepository;
 import it.ids.hackathown.service.dto.AggiornaStatoFormDTO;
@@ -46,6 +47,7 @@ public class HackathonService {
     private final SottomissioneRepository sottomissioneRepository;
     private final ValutazioneRepository valutazioneRepository;
     private final EsitoHackathonRepository esitoRepository;
+    private final TeamRepository teamRepository;
 
     public List<Hackathon> listaHackathonPubblici(String filtri) {
         if (filtri == null || filtri.isBlank()) {
@@ -294,6 +296,28 @@ public class HackathonService {
         hackathonRepository.save(hackathon);
     }
 
+    @Transactional
+    public void avviaHackathon(Integer hackathonId, Integer organizzatoreId) {
+        aggiornaStato(hackathonId, organizzatoreId, StatoHackathon.IN_CORSO.name());
+    }
+
+    @Transactional
+    public void avviaValutazione(Integer hackathonId, Integer organizzatoreId) {
+        aggiornaStato(hackathonId, organizzatoreId, StatoHackathon.IN_VALUTAZIONE.name());
+    }
+
+    @Transactional
+    public void concludiHackathon(Integer hackathonId, Integer organizzatoreId) {
+        if (!isOrganizer(hackathonId, organizzatoreId)) {
+            throw new ForbiddenActionForState("Utente non autorizzato");
+        }
+        Hackathon hackathon = requireHackathon(hackathonId);
+        if (hackathon.getStato() == StatoHackathon.CONCLUSO) {
+            return;
+        }
+        aggiornaStato(hackathonId, organizzatoreId, StatoHackathon.CONCLUSO.name());
+    }
+
     public List<String> calcolaTransizioniPossibili(String statoCorrente) {
         StatoHackathon stato = parseStato(statoCorrente);
         if (stato == null) {
@@ -319,7 +343,7 @@ public class HackathonService {
         if (hackathon.getStato() != StatoHackathon.IN_VALUTAZIONE) {
             throw new DomainValidationException("Hackathon non in valutazione");
         }
-        List<Sottomissione> submissions = sottomissioneRepository.findByIscrizione_Hackathon_Id(hackathonId);
+        List<Sottomissione> submissions = sottomissioneRepository.findByHackathonIdWithTeam(hackathonId);
         return listaTeamCandidati(submissions);
     }
 
@@ -375,9 +399,7 @@ public class HackathonService {
         if (membri <= 0) {
             throw new DomainValidationException("Team non valido");
         }
-
-        Team team = new Team();
-        team.setId(teamId);
+        Team team = teamRepository.getReferenceById(teamId);
 
         EsitoHackathon esito = new EsitoHackathon();
         esito.setHackathon(hackathon);

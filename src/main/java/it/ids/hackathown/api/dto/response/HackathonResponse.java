@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public record HackathonResponse(
-    Long id,
+    Integer id,
     String name,
     String description,
     String rules,

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface IscrizioneRepository extends JpaRepository<Iscrizione, Long> {
+public interface IscrizioneRepository extends JpaRepository<Iscrizione, Integer> {
 
     boolean existsByHackathon_IdAndTeam_Id(Integer hackathonId, Integer teamId);
 
@@ -18,13 +18,6 @@ public interface IscrizioneRepository extends JpaRepository<Iscrizione, Long> {
     long countByHackathon_Id(Integer hackathonId);
 
     void deleteByHackathon_Id(Integer hackathonId);
-
-    default Optional<Iscrizione> findById(Integer id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-        return findById(id.longValue());
-    }
 
     default boolean existsByTeamIdAndHackathonId(Integer teamId, Integer hackathonId) {
         if (teamId == null || hackathonId == null) {

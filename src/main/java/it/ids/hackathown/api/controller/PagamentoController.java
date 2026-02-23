@@ -19,8 +19,8 @@ public class PagamentoController {
 
     @PostMapping("/hackathons/{hackathonId}/prize")
     public ResponseEntity<String> erogaPremio(
-        @RequestHeader(HeaderConstants.USER_ID) Long currentUserId,
-        @PathVariable Long hackathonId
+        @RequestHeader(HeaderConstants.USER_ID) Integer currentUserId,
+        @PathVariable Integer hackathonId
     ) {
         Integer organizzatoreId = requirePositiveId(currentUserId, "Organizzatore");
         Integer hackathon = requirePositiveId(hackathonId, "Hackathon");
@@ -28,10 +28,10 @@ public class PagamentoController {
         return ResponseEntity.ok("Pagamento effettuato con successo");
     }
 
-    private Integer requirePositiveId(Long value, String label) {
+    private Integer requirePositiveId(Integer value, String label) {
         if (value == null || value <= 0) {
             throw new DomainValidationException(label + " non valido");
         }
-        return value.intValue();
+        return value;
     }
 }
