@@ -46,7 +46,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
             return body;
         }
 
-        ApiResponse<Object> wrapped = ApiResponse.ok(body);
+        ApiResponse wrapped = ApiResponse.ok();
         if (StringHttpMessageConverter.class.isAssignableFrom(selectedConverterType)) {
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             return serialize(wrapped);
@@ -62,7 +62,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
         return false;
     }
 
-    private String serialize(ApiResponse<Object> body) {
+    private String serialize(ApiResponse body) {
         try {
             return objectMapper.writeValueAsString(body);
         } catch (JsonProcessingException ex) {

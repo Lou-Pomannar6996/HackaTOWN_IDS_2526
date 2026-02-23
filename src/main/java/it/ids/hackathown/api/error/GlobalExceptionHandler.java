@@ -20,7 +20,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
-    public ResponseEntity<ApiResponse<ErrorInfo>> handleDomainException(
+    public ResponseEntity<ApiResponse> handleDomainException(
         DomainException ex,
         HttpServletRequest request
     ) {
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<ErrorInfo>> handleMethodArgumentNotValid(
+    public ResponseEntity<ApiResponse> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         HttpServletRequest request
     ) {
@@ -39,12 +39,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
-    public ResponseEntity<ApiResponse<ErrorInfo>> handleBadRequest(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse> handleBadRequest(Exception ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "BadRequest", ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<ApiResponse<ErrorInfo>> handleMissingHeader(
+    public ResponseEntity<ApiResponse> handleMissingHeader(
         MissingRequestHeaderException ex,
         HttpServletRequest request
     ) {
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<ErrorInfo>> handleUnhandled(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse> handleUnhandled(Exception ex, HttpServletRequest request) {
         return build(
             HttpStatus.INTERNAL_SERVER_ERROR,
             "InternalServerError",
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    private ResponseEntity<ApiResponse<ErrorInfo>> build(
+    private ResponseEntity<ApiResponse> build(
         HttpStatus status,
         String error,
         String detail,
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
         Object errors
     ) {
         ErrorInfo info = new ErrorInfo(status.value(), error, detail, request.getRequestURI(), errors);
-        return ResponseEntity.status(status).body(new ApiResponse<>("ERROR", info));
+        return ResponseEntity.status(status).body(new ApiResponse("ERROR", info));
     }
 
     private String formatFieldError(FieldError fieldError) {

@@ -36,3 +36,8 @@ out/
 
 # Local-only Spring Boot config (credentials, etc.)
 src/main/resources/application-local.properties
+
+# Temp scripts/artifacts
+tmp_*.py
+tmp_*.json
+.tmp_*.json

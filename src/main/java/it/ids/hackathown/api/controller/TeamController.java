@@ -32,7 +32,11 @@ public class TeamController {
             throw new DomainValidationException("Nome team non valido");
         }
         TeamResponse response = mapper.toResponse(
-            teamService.creaTeam(request.name(), requirePositiveId(currentUserId, "Utente"))
+            teamService.creaTeam(
+                request.name(),
+                requirePositiveId(currentUserId, "Utente"),
+                request.maxSize()
+            )
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

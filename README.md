@@ -176,15 +176,7 @@ curl -X POST http://localhost:8082/api/hackathons/1/teams/1/registrations \
   -H "X-USER-ID: 4"
 ```
 
-5. Carica sottomissione
-```bash
-curl -X POST http://localhost:8082/api/hackathons/1/submissions \
-  -H "Content-Type: application/json" \
-  -H "X-USER-ID: 4" \
-  -d '{"title":"Project Alpha","description":"Demo","repoUrl":"https://github.com/teamalpha/project"}'
-```
-
-6. Aggiorna stato hackathon (organizzatore)
+5. Aggiorna stato hackathon (organizzatore)
 ```bash
 curl -X PUT http://localhost:8082/api/hackathons/1/status \
   -H "Content-Type: application/json" \
@@ -198,6 +190,14 @@ curl -X PUT http://localhost:8082/api/hackathons/1/status \
 ```
 Nota: le transizioni sono vincolate alle date. Se la transizione fallisce, imposta `registrationDeadline`,
 `startDate` ed `endDate` nel passato quando crei l'hackathon.
+
+6. Carica sottomissione (solo quando lo stato è `IN_CORSO`)
+```bash
+curl -X POST http://localhost:8082/api/hackathons/1/submissions \
+  -H "Content-Type: application/json" \
+  -H "X-USER-ID: 4" \
+  -d '{"title":"Project Alpha","description":"Demo","repoUrl":"https://github.com/teamalpha/project"}'
+```
 
 7. Valuta sottomissione (giudice)
 ```bash

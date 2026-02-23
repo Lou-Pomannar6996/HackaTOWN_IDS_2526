@@ -21,10 +21,13 @@ public class TeamService {
     private final UtenteRepository utenteRepository;
 
     @Transactional
-    public Team creaTeam(String nome, Integer utenteId) {
+    public Team creaTeam(String nome, Integer utenteId, Integer maxSize) {
         String normalized = nome == null ? "" : nome.trim();
         if (normalized.isEmpty()) {
             throw new DomainValidationException("Nome team non valido");
+        }
+        if (maxSize == null || maxSize <= 0) {
+            throw new DomainValidationException("Dimensione team non valida");
         }
         Utente utente = utenteRepository.findById(utenteId)
             .orElseThrow(() -> new NotFoundException("Utente non trovato"));
@@ -34,7 +37,7 @@ public class TeamService {
 
         Team team = Team.builder()
             .nome(normalized)
-            .maxMembri(4)
+            .maxMembri(maxSize)
             .dataCreazione(LocalDateTime.now())
             .build();
         team.addMembro(utente);
